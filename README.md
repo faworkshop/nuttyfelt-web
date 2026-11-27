@@ -86,33 +86,13 @@ Set these variables on the Railway service (same names as `.env.example`):
 
 After the first public URL exists, add that origin to R2 CORS (`scripts/r2-cors.json`).
 
-## CI / CD
+## CI
 
-GitHub Actions:
+GitHub Actions (`.github/workflows/ci.yml`) runs on PRs and pushes to `main` / `develop`:
 
-| Workflow | Trigger | What it does |
-| --- | --- | --- |
-| `.github/workflows/ci.yml` | PR + push to `main` / `develop` | `lint` → `typecheck` → `build` → Playwright e2e |
-| `.github/workflows/deploy.yml` | Push to `develop` (or manual) | `railway up` to production |
+`lint` → `typecheck` → `build` → Playwright e2e
 
-### One-time GitHub secrets
-
-Create a Railway account token, then add repository secrets:
-
-| Secret | Value |
-| --- | --- |
-| `RAILWAY_TOKEN` | Railway account token ([tokens](https://railway.com/account/tokens)) |
-| `RAILWAY_PROJECT_ID` | `02a656e4-4286-4a4d-8016-6e477f6f2e2b` |
-| `RAILWAY_SERVICE_ID` | `4708331d-3658-40fa-9e82-8536c7c51672` |
-| `RAILWAY_ENVIRONMENT_ID` | `c2b6630e-bba3-4e66-8f41-cf346d24a548` |
-
-Optional: create a GitHub Environment named `production` (used by the deploy workflow) and restrict who can approve deploys.
-
-### Flow
-
-1. Open a PR → CI must pass (lint, types, build, e2e).
-2. Merge to `develop` → CI runs again, then Deploy ships to Railway.
-3. Manual redeploy: Actions → **Deploy** → **Run workflow**.
+**Deploy** is handled by Railway’s GitHub integration (auto-deploy on push). Connect the repo in the Railway service settings if it is not already linked — no GitHub deploy workflow or `RAILWAY_TOKEN` secrets needed.
 
 Local parity:
 
