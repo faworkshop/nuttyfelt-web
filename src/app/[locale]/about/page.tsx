@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, organizationJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
+  const t = await getTranslations({ locale, namespace: "about" });
+  return pageMetadata({
+    locale,
+    pathname: "/about",
+    title: t("title"),
+    description: t("lede"),
+  });
+}
 
 export default function AboutPage({ params }: Props) {
   return (
@@ -14,7 +31,8 @@ export default function AboutPage({ params }: Props) {
 }
 
 async function AboutContent({ params }: Props) {
-  const { locale } = await params;
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("about");
   const th = await getTranslations("home");
@@ -22,6 +40,12 @@ async function AboutContent({ params }: Props) {
 
   return (
     <section className="section-pad">
+      <JsonLd data={organizationJsonLd()} />
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), pathname: "/about" },
+        ])}
+      />
       <div className="measure-wide grid items-center gap-10 md:grid-cols-2 md:gap-16">
         <div className="photo-frame photo-placeholder order-2 aspect-[4/5] md:order-1">
           <div className="halo-ring" />

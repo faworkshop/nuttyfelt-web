@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
+  const t = await getTranslations({ locale, namespace: "halo" });
+  return pageMetadata({
+    locale,
+    pathname: "/halo",
+    title: t("title"),
+    description: t("lede"),
+  });
+}
 
 export default function HaloPage({ params }: Props) {
   return (
@@ -14,12 +31,18 @@ export default function HaloPage({ params }: Props) {
 }
 
 async function HaloContent({ params }: Props) {
-  const { locale } = await params;
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("halo");
 
   return (
     <>
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), pathname: "/halo" },
+        ])}
+      />
       <section className="relative min-h-[70svh] overflow-hidden">
         <div className="absolute inset-0">
           <div className="photo-frame photo-placeholder h-full w-full">

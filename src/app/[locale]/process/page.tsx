@@ -1,9 +1,29 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  commissionOfferJsonLd,
+} from "@/lib/structured-data";
 
 type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
+  const t = await getTranslations({ locale, namespace: "process" });
+  return pageMetadata({
+    locale,
+    pathname: "/process",
+    title: t("title"),
+    description: t("lede"),
+  });
+}
 
 export default function ProcessPage({ params }: Props) {
   return (
@@ -14,7 +34,8 @@ export default function ProcessPage({ params }: Props) {
 }
 
 async function ProcessContent({ params }: Props) {
-  const { locale } = await params;
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("process");
   const th = await getTranslations("home");
@@ -22,6 +43,12 @@ async function ProcessContent({ params }: Props) {
 
   return (
     <section className="section-pad">
+      <JsonLd data={commissionOfferJsonLd(locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), pathname: "/process" },
+        ])}
+      />
       <div className="measure">
         <p className="eyebrow">Process</p>
         <h1 className="page-title mt-3">{t("title")}</h1>

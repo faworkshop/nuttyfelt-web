@@ -1,12 +1,32 @@
 import Image from "next/image";
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
+import {
+  commissionOfferJsonLd,
+  organizationJsonLd,
+} from "@/lib/structured-data";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
+  const t = await getTranslations({ locale, namespace: "home" });
+  return pageMetadata({
+    locale,
+    pathname: "/",
+    title: t("headline"),
+    description: t("lede"),
+  });
+}
 
 export default function HomePage({ params }: Props) {
   return (
@@ -17,12 +37,15 @@ export default function HomePage({ params }: Props) {
 }
 
 async function HomeContent({ params }: Props) {
-  const { locale } = await params;
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("home");
 
   return (
     <>
+      <JsonLd data={organizationJsonLd()} />
+      <JsonLd data={commissionOfferJsonLd(locale)} />
       <section className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0">
           <div className="photo-frame photo-placeholder h-full w-full">
