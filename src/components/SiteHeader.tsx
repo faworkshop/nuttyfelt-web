@@ -34,6 +34,7 @@ export function SiteHeader() {
             width={280}
             height={60}
             className="brand-logo"
+            style={{ width: "auto", height: "auto" }}
             priority
           />
         </Link>
@@ -81,6 +82,7 @@ export function SiteHeader() {
                 width={280}
                 height={60}
                 className="brand-logo"
+                style={{ width: "auto", height: "auto" }}
               />
               <button
                 type="button"

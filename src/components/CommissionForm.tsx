@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { FormEvent, useId, useMemo, useState } from "react";
+import { FormEvent, useId, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { uploadFileToR2 } from "@/lib/client-upload";
 import {
@@ -39,12 +39,21 @@ function newFileId() {
 export function CommissionForm() {
   const t = useTranslations("commission");
   const locale = useLocale();
-  const uploadSessionId = useMemo(() => crypto.randomUUID(), []);
+  // Defer UUID until interaction so prerender does not call crypto.randomUUID().
+  const uploadSessionIdRef = useRef<string | null>(null);
   const basicInputId = useId();
   const extraInputId = useId();
 
+  function getUploadSessionId() {
+    if (!uploadSessionIdRef.current) {
+      uploadSessionIdRef.current = crypto.randomUUID();
+    }
+    return uploadSessionIdRef.current;
+  }
+
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(false);
+  const [requestRef, setRequestRef] = useState<string | null>(null);
   const [location, setLocation] = useState("hk");
   const [files, setFiles] = useState<TrackedFile[]>([]);
   const [photoError, setPhotoError] = useState(false);
@@ -151,7 +160,7 @@ export function CommissionForm() {
     try {
       const { storageKey } = await uploadFileToR2(item.file, {
         group: item.group,
-        uploadSessionId,
+        uploadSessionId: getUploadSessionId(),
         onProgress: (ratio) => updateFile(item.id, { progress: ratio }),
       });
       updateFile(item.id, {
@@ -223,7 +232,7 @@ export function CommissionForm() {
       agreedTerms: data.get("terms") === "on",
       agreedHandmade: data.get("handmade") === "on",
       publicity: String(data.get("publicity") ?? "").trim(),
-      uploadSessionId,
+      uploadSessionId: getUploadSessionId(),
       files: uploaded,
     };
 
@@ -235,6 +244,8 @@ export function CommissionForm() {
       });
       const result = (await response.json().catch(() => ({}))) as {
         error?: string;
+        requestId?: string;
+        referenceNo?: string;
       };
 
       if (!response.ok) {
@@ -243,6 +254,7 @@ export function CommissionForm() {
         return;
       }
 
+      setRequestRef(result.referenceNo ?? null);
       setDone(true);
     } catch {
       setSubmitError(t("submitFailed"));
@@ -315,6 +327,14 @@ export function CommissionForm() {
       <div className="rounded-md border border-line bg-wool px-5 py-10">
         <h2 className="font-display text-2xl">{t("successTitle")}</h2>
         <p className="mt-4 leading-relaxed text-ink-muted">{t("successBody")}</p>
+        {requestRef ? (
+          <p className="mt-6 font-ui text-sm text-ink">
+            <span className="text-ink-muted">{t("successRef")}</span>
+            <span className="mt-1 block font-mono text-xl tracking-wide">
+              {requestRef}
+            </span>
+          </p>
+        ) : null}
         <p className="mt-4 font-ui text-sm text-ink-muted">{t("successNote")}</p>
         <Link href="/" className="btn-secondary mt-8">
           nuttyfelt

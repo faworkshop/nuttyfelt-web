@@ -5,6 +5,7 @@ import { commissionFiles, commissionRequests } from "@/db/schema";
 import { sendClientConfirmation, sendStudioNotification } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
 import { getSignedDownloadUrl, headObject } from "@/lib/r2-objects";
+import { toReferenceNo } from "@/lib/reference";
 import {
   MAX_FILES_PER_GROUP,
   MAX_UPLOAD_BYTES,
@@ -12,8 +13,6 @@ import {
   isUploadGroup,
   type UploadGroup,
 } from "@/lib/uploads";
-
-export const runtime = "nodejs";
 
 type FileInput = {
   group?: string;
@@ -328,6 +327,7 @@ export async function POST(request: NextRequest) {
 
   try {
     await sendClientConfirmation({
+      requestId,
       email,
       displayName,
       catName,
@@ -357,6 +357,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     requestId,
+    referenceNo: toReferenceNo(requestId),
     email: { notify: notifyOk, confirm: confirmOk },
   });
 }

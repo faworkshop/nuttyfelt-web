@@ -2,6 +2,7 @@ import { Figtree, Fraunces, Noto_Sans_TC, Noto_Serif_HK, Source_Serif_4 } from "
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { routing } from "@/i18n/routing";
@@ -39,6 +40,8 @@ const notoSansTc = Noto_Sans_TC({
   display: "swap",
 });
 
+const fontClassName = `${fraunces.variable} ${sourceSerif.variable} ${figtree.variable} ${notoSerifHk.variable} ${notoSansTc.variable} h-full`;
+
 type Props = {
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
@@ -47,6 +50,9 @@ type Props = {
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+// Locale must be read from params for next-intl; Instant validation can't wrap <html> in Suspense.
+export const instant = false;
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
@@ -60,11 +66,14 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html
       lang={locale}
-      className={`${fraunces.variable} ${sourceSerif.variable} ${figtree.variable} ${notoSerifHk.variable} ${notoSansTc.variable} h-full`}
+      data-scroll-behavior="smooth"
+      className={fontClassName}
     >
       <body className="flex min-h-full flex-col">
         <NextIntlClientProvider messages={messages}>
-          <SiteHeader />
+          <Suspense fallback={<div className="h-16 border-b border-line/60 bg-paper/90" />}>
+            <SiteHeader />
+          </Suspense>
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </NextIntlClientProvider>

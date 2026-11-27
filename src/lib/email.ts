@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { getResendEnv } from "./env";
+import { toReferenceNo } from "./reference";
 
 let client: Resend | null = null;
 
@@ -66,7 +67,7 @@ export async function sendStudioNotification(payload: NotifyPayload) {
 
   const html = `
     <h2>New commission request</h2>
-    <p>Request ID: <code>${escapeHtml(payload.requestId)}</code> · Locale: ${escapeHtml(payload.locale)}</p>
+    <p>Ref: <strong>${escapeHtml(toReferenceNo(payload.requestId))}</strong> · Locale: ${escapeHtml(payload.locale)}</p>
     <table>
       ${row("Email", payload.email)}
       ${row("Name", payload.displayName)}
@@ -105,36 +106,65 @@ export async function sendStudioNotification(payload: NotifyPayload) {
   return result.data?.id ?? null;
 }
 
+function isResendTestSender(emailFrom: string) {
+  return emailFrom.toLowerCase() === "onboarding@resend.dev";
+}
+
 export async function sendClientConfirmation(input: {
+  requestId: string;
   email: string;
   displayName: string;
   catName: string;
   locale: string;
 }) {
-  const { emailFrom } = getResendEnv();
+  const { emailFrom, notifyEmail } = getResendEnv();
   const zh = input.locale === "zh-Hant";
+
+  // Resend's onboarding sender can only deliver to the account owner.
+  // Redirect confirmations there during local/test sends so smoke tests pass.
+  const testSender = isResendTestSender(emailFrom);
+  const recipient =
+    testSender && input.email.toLowerCase() !== notifyEmail.toLowerCase()
+      ? notifyEmail
+      : input.email;
+  const redirected = recipient.toLowerCase() !== input.email.toLowerCase();
 
   const subject = zh
     ? `已收到你的 nuttyfelt 訂製申請（${input.catName}）`
     : `We received your nuttyfelt commission request (${input.catName})`;
 
+  const redirectNote = redirected
+    ? zh
+      ? `<p style="color:#666;font-size:12px">測試模式：本應寄往 ${escapeHtml(input.email)}，因 Resend 未驗證網域改寄至此。</p>`
+      : `<p style="color:#666;font-size:12px">Test mode: intended for ${escapeHtml(input.email)}; redirected here because the Resend domain is unverified.</p>`
+    : "";
+
+  const ref = toReferenceNo(input.requestId);
+  const refBlock = zh
+    ? `<p>申請編號：<strong>${escapeHtml(ref)}</strong></p>`
+    : `<p>Reference no.: <strong>${escapeHtml(ref)}</strong></p>`;
+
   const html = zh
     ? `
+      ${redirectNote}
       <p>${escapeHtml(input.displayName)} 你好，</p>
       <p>我們已收到關於 <strong>${escapeHtml(input.catName)}</strong> 的訂製申請。</p>
+      ${refBlock}
       <p>目標三日內回覆照片是否足夠，以及預計檔期。付款會在確認後另行安排。</p>
       <p>— nuttyfelt</p>
     `
     : `
+      ${redirectNote}
       <p>Hi ${escapeHtml(input.displayName)},</p>
       <p>We received your commission request for <strong>${escapeHtml(input.catName)}</strong>.</p>
+      ${refBlock}
       <p>We aim to reply within three days on whether the photos are enough and which month is scheduled. Payment stays off-site after we confirm.</p>
       <p>— nuttyfelt</p>
     `;
 
   const result = await getResend().emails.send({
     from: `nuttyfelt <${emailFrom}>`,
-    to: [input.email],
+    to: [recipient],
     subject,
     html,
   });

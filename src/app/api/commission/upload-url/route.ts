@@ -13,8 +13,6 @@ import {
   isUploadGroup,
 } from "@/lib/uploads";
 
-export const runtime = "nodejs";
-
 type Body = {
   filename?: string;
   contentType?: string;

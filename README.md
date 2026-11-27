@@ -54,7 +54,7 @@ Optional (needs an Admin R2 token): `npm run r2:cors`
 - Studio (`NOTIFY_EMAIL`) — answers + 7-day signed photo links
 - Client — confirmation (no private living-status)
 
-Requires `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `EMAIL_FROM`. Until the production domain is verified in Resend, use Resend’s test sender for `EMAIL_FROM`.
+Requires `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `EMAIL_FROM`. Until `nuttyfelt.com` is verified in Resend, set `EMAIL_FROM=onboarding@resend.dev`. That test sender can only deliver to your Resend account email (`NOTIFY_EMAIL`); client confirmations to other addresses are redirected there with a test-mode note. Restart `next dev` after changing `.env.local`.
 
 ## Scripts
 
@@ -64,6 +64,7 @@ Requires `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `EMAIL_FROM`. Until the productio
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
 | `npm run lint` | ESLint |
+| `npm run test:e2e` | Playwright commission form submit tests (builds + `next start` if needed) |
 | `npm run db:generate` | Generate migrations |
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:studio` | Drizzle Studio |

@@ -31,6 +31,7 @@ export async function SiteFooter() {
               width={280}
               height={60}
               className="brand-logo"
+              style={{ width: "auto", height: "auto" }}
             />
           </Link>
           <p className="mt-3 font-ui text-sm text-ink-muted">{tRoot("footerTag")}</p>

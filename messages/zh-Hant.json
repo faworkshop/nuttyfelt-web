@@ -117,6 +117,7 @@
     "uploading": "上載中…",
     "successTitle": "已收到你的申請",
     "successBody": "請查看電郵確認。我們目標三日內回覆照片是否足夠，以及預計檔期。",
+    "successRef": "申請編號",
     "successNote": "付款會在確認後以轉數快、PayMe 或 PayPal 另行處理。",
     "addFiles": "選擇照片",
     "remove": "移除",

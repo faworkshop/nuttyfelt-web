@@ -1,9 +1,19 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
 
 type Props = { params: Promise<{ locale: string }> };
 
-export default async function AboutPage({ params }: Props) {
+export default function AboutPage({ params }: Props) {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <AboutContent params={params} />
+    </Suspense>
+  );
+}
+
+async function AboutContent({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("about");

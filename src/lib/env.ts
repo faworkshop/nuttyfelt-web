@@ -18,10 +18,25 @@ export function getR2Env() {
   };
 }
 
+const SIMPLE_EMAIL_RE = /^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/;
+
 export function getResendEnv() {
+  const apiKey = required("RESEND_API_KEY");
+  const notifyEmail = required("NOTIFY_EMAIL").trim();
+  const emailFrom = required("EMAIL_FROM").trim();
+
+  if (!SIMPLE_EMAIL_RE.test(notifyEmail)) {
+    throw new Error("NOTIFY_EMAIL must be a plain address like name@example.com");
+  }
+  if (!SIMPLE_EMAIL_RE.test(emailFrom)) {
+    throw new Error(
+      "EMAIL_FROM must be a plain address like hello@example.com (no quotes/backticks)",
+    );
+  }
+
   return {
-    apiKey: required("RESEND_API_KEY"),
-    notifyEmail: required("NOTIFY_EMAIL"),
-    emailFrom: required("EMAIL_FROM"),
+    apiKey,
+    notifyEmail,
+    emailFrom,
   };
 }
