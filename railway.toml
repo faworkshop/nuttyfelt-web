@@ -1,6 +1,7 @@
 [build]
 builder = "NIXPACKS"
-buildCommand = "npm ci && npm run build"
+# Nixpacks already runs install; only build here (avoids npm ci EBUSY on cache mounts).
+buildCommand = "npm run build"
 
 [deploy]
 startCommand = "npm run start"
