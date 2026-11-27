@@ -1,28 +1,27 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { faqs } from "@/lib/faq-content";
+import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd, faqPageJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ locale: string }> };
 
-const faqs = {
-  "zh-Hant": [
-    { q: "價錢多少？", a: "常規 HK$5,000。早鳥首 3 位 HK$4,250（需 IG 發文及文字評價）。海外運費與匯款手續費另計。" },
-    { q: "光環多大？", a: "短毛約 13 cm；長毛約 15 cm。附畫架與護理蠟。" },
-    { q: "要等多久？", a: "暫時約每月一件；製作約 3–4 星期。目標三日內回覆照片與檔期。" },
-    { q: "有什麼不做？", a: "張口或特殊表情、頸圈／配件、加急單。" },
-    { q: "點樣交收？", a: "香港：順豐到付，或南港島線站面交。海外：實報運費，關稅自付。" },
-    { q: "可以改幾多？", a: "尾款後最多兩次小修改。結構比例、換貓、轉頭或改光環尺寸不屬於小修改。" },
-  ],
-  en: [
-    { q: "How much?", a: "Regular HK$5,000. Early-bird HK$4,250 for the first 3 clients (IG post + written testimonial). Overseas shipping and remittance fees extra." },
-    { q: "Halo size?", a: "Short-hair about 13 cm; long-hair about 15 cm. Stand and protective wax included." },
-    { q: "How long?", a: "About one commission a month; roughly 3–4 weeks to make. We aim to reply within 3 days on photos and schedule." },
-    { q: "What is not offered?", a: "Open-mouth or special expressions, collars/accessories, rush orders." },
-    { q: "Delivery?", a: "Hong Kong: SF Express freight collect, or in-person at a South Island Line MTR station. Overseas: actual shipping; duties paid by the client." },
-    { q: "Revisions?", a: "Up to two minor revisions after the balance. Structure, switching cats, head direction, or halo size are not minor revisions." },
-  ],
-} as const;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
+  const t = await getTranslations({ locale, namespace: "faq" });
+  return pageMetadata({
+    locale,
+    pathname: "/faq",
+    title: t("title"),
+    description: t("lede"),
+  });
+}
 
 export default function FaqPage({ params }: Props) {
   return (
@@ -33,14 +32,19 @@ export default function FaqPage({ params }: Props) {
 }
 
 async function FaqContent({ params }: Props) {
-  const { locale } = await params;
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("faq");
   const th = await getTranslations("home");
-  const items = faqs[locale === "en" ? "en" : "zh-Hant"];
+  const items = faqs[locale];
 
   return (
     <section className="section-pad">
+      <JsonLd data={faqPageJsonLd(locale)} />
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [{ name: t("title"), pathname: "/faq" }])}
+      />
       <div className="measure">
         <p className="eyebrow">FAQ</p>
         <h1 className="page-title mt-3">{t("title")}</h1>

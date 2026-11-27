@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Suspense } from "react";
+import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
+import { breadcrumbJsonLd } from "@/lib/structured-data";
 
 type Props = { params: Promise<{ locale: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
+  const t = await getTranslations({ locale, namespace: "works" });
+  return pageMetadata({
+    locale,
+    pathname: "/works",
+    title: t("title"),
+    description: t("lede"),
+  });
+}
 
 export default function WorksPage({ params }: Props) {
   return (
@@ -14,13 +31,19 @@ export default function WorksPage({ params }: Props) {
 }
 
 async function WorksContent({ params }: Props) {
-  const { locale } = await params;
+  const { locale: raw } = await params;
+  const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("works");
   const th = await getTranslations("home");
 
   return (
     <section className="section-pad">
+      <JsonLd
+        data={breadcrumbJsonLd(locale, [
+          { name: t("title"), pathname: "/works" },
+        ])}
+      />
       <div className="measure-wide">
         <p className="eyebrow">Works</p>
         <h1 className="page-title mt-3">{t("title")}</h1>

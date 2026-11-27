@@ -17,7 +17,10 @@ export default defineConfig({
   },
   webServer: {
     // Production server avoids flaky Instant/HMR hydration issues in next dev.
-    command: `npm run build && npx next start --port ${PORT}`,
+    // CI already ran `npm run build` in the same job.
+    command: process.env.CI
+      ? `npx next start --port ${PORT}`
+      : `npm run build && npx next start --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

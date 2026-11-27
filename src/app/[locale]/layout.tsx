@@ -1,11 +1,15 @@
 import { Figtree, Fraunces, Noto_Sans_TC, Noto_Serif_HK, Source_Serif_4 } from "next/font/google";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import type { AppLocale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { pageMetadata } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 import "../globals.css";
 
 const fraunces = Fraunces({
@@ -49,6 +53,26 @@ type Props = {
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: raw } = await params;
+  const locale = (hasLocale(routing.locales, raw) ? raw : routing.defaultLocale) as AppLocale;
+  const t = await getTranslations({ locale, namespace: "home" });
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    ...pageMetadata({
+      locale,
+      pathname: "/",
+      title: t("headline"),
+      description: t("lede"),
+    }),
+  };
 }
 
 // Locale must be read from params for next-intl; Instant validation can't wrap <html> in Suspense.
