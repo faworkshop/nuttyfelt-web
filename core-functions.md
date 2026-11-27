@@ -32,7 +32,7 @@ These facts come from the current Google Form (nuttyfelt 訂製表格) and must 
 **Price and inclusions**
 
 - Regular price: HK$5,000, the same for long- and short-hair; complex coloring is not charged extra.
-- Early-bird: HK$4,250 for the first 3 clients, if they agree to an Instagram post and a written testimonial. Treat whether this offer is still open as a product fact to confirm when building, not something to invent.
+- Early-bird: HK$4,250 for the first 3 clients, if they agree to an Instagram post and a written testimonial. **Still offered at launch** (confirmed).
 - Included: a realistic needle-felted cat half-bust on a metal halo board (short-hair 13 cm, long-hair 15 cm), stand, one black-and-white hand-drawn cat portrait, and a small box of protective wax.
 - Overseas: shipping and remittance fees are extra.
 - Not offered: open-mouth or special expressions, collars or accessories, rush orders.
@@ -72,7 +72,7 @@ These facts come from the current Google Form (nuttyfelt 訂製表格) and must 
 
 ## Commission request (v1 intake)
 
-The first-party form replaces the Google Form intake. It should collect the same information, stay on one clear mobile flow, and work without a Google sign-in.
+The first-party form replaces the Google Form intake. It should collect the same information, use a clear **stepped mobile flow** (contact → cat → photos → confirm), and work without a Google sign-in.
 
 ### Required
 

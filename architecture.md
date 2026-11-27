@@ -89,7 +89,7 @@ If email delivery fails after the request is stored, the failure should be visib
 
 ### Phase 2: admin portal
 
-A private, authenticated admin portal in the same application. It should not be linked from the public navigation in a way that invites visitors to sign in. This can wait until after the public site and form are live.
+A private, authenticated admin portal in the same application. It should not be linked from the public navigation in a way that invites visitors to sign in. **v1 stays email-only** for the artist (notification + signed photo links); this portal waits until after the public site and form are live.
 
 Two areas:
 
@@ -130,7 +130,7 @@ If verification fails, nothing is marked as received, and the client is asked to
 
 Production and staging must use separate databases, buckets, and email recipients. Do not put secrets in the repository.
 
-The public site should run on HTTPS on a domain chosen later (open decision). Instagram and Threads remain the social profiles; the site should use the same brand name, nuttyfelt.
+The public site should run on HTTPS on a domain chosen later (still open). Mail defaults: notify `faworkshop18@gmail.com`, from `hello@nuttyfelt.com` — both configurable. Instagram and Threads remain the social profiles; the site should use the same brand name, nuttyfelt.
 
 ## Security and privacy
 

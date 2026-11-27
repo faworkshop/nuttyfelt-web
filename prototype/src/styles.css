@@ -109,6 +109,30 @@
     @apply inline-flex items-center justify-center rounded-md border border-line bg-transparent px-5 py-3 font-ui text-sm font-medium text-ink transition-colors duration-200 hover:border-brass hover:text-ink;
   }
 
+  .stepper-item {
+    @apply flex flex-col items-center gap-1 text-center;
+  }
+
+  .stepper-num {
+    @apply flex h-8 w-8 items-center justify-center rounded-md border border-line font-ui text-sm text-ink-muted;
+  }
+
+  .stepper-label {
+    @apply font-ui text-[0.65rem] leading-tight text-ink-muted md:text-xs;
+  }
+
+  .stepper-item.is-active .stepper-num {
+    @apply border-brass bg-brass font-semibold text-ink;
+  }
+
+  .stepper-item.is-active .stepper-label {
+    @apply text-ink;
+  }
+
+  .stepper-item.is-done .stepper-num {
+    @apply border-brass-deep bg-wool text-ink;
+  }
+
   .section-pad {
     @apply px-5 py-16 md:px-10 md:py-24 lg:px-16;
   }

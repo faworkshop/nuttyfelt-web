@@ -186,20 +186,18 @@ Accordion or stacked Q&A (not a card maze). Topics: price, sizes, lead time, wha
 
 **Overall UX:**
 
-- Single continuous flow on one page (sections), not a multi-wizard that loses context — unless usability testing shows a short 3-step stepper helps (Contact → Cat & photos → Consents). Prefer sections with a sticky “Submit” on mobile if long.
-- Progress indication if stepped; otherwise clear section headings.
-- Validate inline; block submit until required fields and uploads meet rules.
+- **Stepped wizard** (not one long page). Four steps with a progress indicator; answers persist while moving back/forward.
+- Validate the current step before advancing; block final submit until required fields, photos, and consents meet rules.
 - Success: calm confirmation screen + “check your email”; no private status echoed back.
 
-**Section order:**
+**Steps:**
 
-1. Intro — link to Process; note ~1/month and reply within ~3 days
-2. Contact — email, 稱呼, Instagram, WhatsApp (`/` ok overseas), location
-3. Cat — name, coat length (13 / 15 cm), features to preserve; optional sex/breed, hoped date, stories, how-found
-4. Photos — two upload groups (up to 10 each, 100 MB/file); guidance for angles and natural light; encourage 8–10 clear photos over max size
-5. Private status — optional “貓貓現在…” with explicit copy that this is never published
-6. Consents — terms (落單需知), handmade-likeness acknowledgement, publicity (tag / do not tag)
-7. Submit
+1. **Contact** — email, 稱呼, Instagram, WhatsApp (`/` ok overseas), location
+2. **Cat** — name, coat length (13 / 15 cm), features to preserve; optional sex/breed, hoped date, stories, how-found
+3. **Photos** — two upload groups (up to 10 each, 100 MB/file); guidance for angles and natural light; at least one basic-angle photo required to continue
+4. **Confirm** — optional “貓貓現在…” (never published) + consents (terms, handmade-likeness, publicity tag / do not tag) → Submit
+
+Intro above the stepper: link to Process; note ~1/month and reply within ~3 days.
 
 **Upload UX:**
 
@@ -260,8 +258,8 @@ Confirm with the studio before locking UI copy and comps:
 
 1. Real hero and Works photography set (who supplies; which pieces are public).
 2. Exact brand wordmark treatment (lettercase: `nuttyfelt` vs Nuttyfelt; any mark besides type).
-3. Whether early-bird appears on Process / Home / FAQ.
-4. Commission form: single long page vs 3 sections/steps.
+3. Early-bird is still offered — include it on Process / Home / FAQ.
+4. Commission form uses a 4-step wizard (Contact → Cat → Photos → Confirm).
 5. Tone of ZH copy (written Hong Kong Chinese register) — who reviews.
 6. Privacy policy page: include in v1 nav/footer or not.
 

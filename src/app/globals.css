@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+/* Wool & gold — aligned to nuttyfelt logo */
+@theme {
+  --color-paper: #f5f0e6;
+  --color-mist: #e8e0d2;
+  --color-ink: #482818;
+  --color-ink-muted: #6b5344;
+  --color-brass: #c8a048;
+  --color-brass-deep: #a88430;
+  --color-wool: #faf7f1;
+  --color-line: #d9d0c2;
+  --color-danger: #8b3a2f;
+  --color-success: #3f5d4a;
+
+  --font-display: var(--font-fraunces), var(--font-noto-serif-hk), serif;
+  --font-body: var(--font-source-serif), var(--font-noto-serif-hk), serif;
+  --font-ui: var(--font-figtree), var(--font-noto-sans-tc), sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(250, 247, 241, 0.95), transparent 50%),
+      radial-gradient(ellipse at 80% 15%, rgba(200, 160, 72, 0.08), transparent 42%),
+      linear-gradient(180deg, #f5f0e6 0%, #efe6d8 100%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brass) 40%, white);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-brass px-5 py-3 font-ui text-sm font-semibold text-ink transition-colors duration-200 hover:bg-brass-deep;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-line bg-transparent px-5 py-3 font-ui text-sm font-medium text-ink transition-colors duration-200 hover:border-brass;
+  }
+
+  .nav-link {
+    @apply font-ui text-sm tracking-wide text-ink-muted hover:text-ink;
+  }
+
+  .section-pad {
+    @apply px-5 py-16 md:px-10 md:py-24 lg:px-16;
+  }
+
+  .measure {
+    @apply mx-auto max-w-xl;
+  }
+
+  .measure-wide {
+    @apply mx-auto max-w-3xl;
+  }
+
+  .eyebrow {
+    @apply font-ui text-xs uppercase tracking-[0.18em] text-brass-deep;
+  }
+
+  .page-title {
+    @apply font-display text-3xl font-medium tracking-tight text-ink md:text-4xl;
+  }
+
+  .section-title {
+    @apply font-display text-2xl font-medium tracking-tight text-ink md:text-3xl;
+  }
+
+  .lede {
+    @apply mt-4 text-lg leading-relaxed text-ink-muted;
+  }
+
+  .field {
+    @apply flex flex-col gap-2;
+  }
+
+  .field label {
+    @apply font-ui text-sm font-medium text-ink;
+  }
+
+  .field .hint {
+    @apply font-ui text-xs leading-relaxed text-ink-muted;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    @apply w-full rounded-md border border-line bg-wool px-3 py-3 font-ui text-base text-ink placeholder:text-ink-muted/60;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    @apply border-brass outline-none ring-2 ring-brass/30;
+  }
+
+  .photo-frame {
+    @apply relative overflow-hidden bg-mist;
+  }
+
+  .photo-placeholder {
+    background:
+      radial-gradient(circle at 50% 42%, rgba(200, 160, 72, 0.4) 0%, rgba(200, 160, 72, 0.12) 28%, transparent 42%),
+      radial-gradient(ellipse at 50% 48%, #c4b49a 0%, #8a6e4e 38%, #482818 78%),
+      linear-gradient(165deg, #d8cbb8, #a89070);
+  }
+
+  .photo-placeholder::after {
+    content: "";
+    position: absolute;
+    inset: 18% 28% 28%;
+    border-radius: 50% 50% 45% 45%;
+    background: radial-gradient(circle at 35% 35%, #faf7f1, #d2c4b0 45%, #6b5344 100%);
+    box-shadow: inset 0 0 20px rgba(72, 40, 24, 0.2);
+    opacity: 0.9;
+  }
+
+  .halo-ring {
+    position: absolute;
+    inset: 12% 18%;
+    border: 3px solid color-mix(in srgb, var(--color-brass) 85%, white);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-ink) 35%, transparent),
+      inset 0 0 18px rgba(200, 160, 72, 0.28);
+    pointer-events: none;
+  }
+
+  .brand-logo {
+    display: block;
+    height: 2.25rem;
+    width: auto;
+  }
+
+  @media (min-width: 768px) {
+    .brand-logo {
+      height: 2.75rem;
+    }
+  }
+
+  .brand-logo-lg {
+    display: block;
+    height: auto;
+    width: min(100%, 28rem);
+    max-height: 5.5rem;
+  }
+
+  .stepper-item {
+    @apply flex flex-col items-center gap-1 text-center;
+  }
+
+  .stepper-num {
+    @apply flex h-8 w-8 items-center justify-center rounded-md border border-line font-ui text-sm text-ink-muted;
+  }
+
+  .stepper-label {
+    @apply font-ui text-[0.65rem] leading-tight text-ink-muted md:text-xs;
+  }
+
+  .stepper-item.is-active .stepper-num {
+    @apply border-brass bg-brass font-semibold text-ink;
+  }
+
+  .stepper-item.is-active .stepper-label {
+    @apply text-ink;
+  }
+
+  .stepper-item.is-done .stepper-num {
+    @apply border-brass-deep bg-wool text-ink;
+  }
+}

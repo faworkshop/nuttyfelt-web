@@ -54,7 +54,7 @@ If hosting moves to Cloudflare Workers / Pages, the same pattern still applies: 
 
 Neon Postgres can scale to zero between the rare requests and still be available when a form is submitted. **Supabase** is a good alternative if the team wants a dashboard, auth for later admin, and Postgres in one product. Even then, use R2 (or S3) for the large originals rather than Supabase Storage as the only plan, and confirm size limits before choosing otherwise.
 
-Resend is the default email choice because it is simple and works well from a Next.js route. **Postmark** or **Amazon SES** are alternatives. The studio’s destination inbox is an open decision (whichever address nuttyfelt already uses for clients).
+Resend is the default email choice because it is simple and works well from a Next.js route. **Postmark** or **Amazon SES** are alternatives. Studio notification and from-address are **environment variables** (not hard-coded): defaults for launch are notify `faworkshop18@gmail.com`, from `hello@nuttyfelt.com` (domain DNS for sending still to set when the production domain is chosen).
 
 ## Auth
 
@@ -83,9 +83,9 @@ Leave payment off the website in v1. FPS and PayMe are typically confirmed by th
 
 No extra “GEO platform” is required.
 
-## Analytics and errors (optional)
+## Analytics and errors
 
-If analytics are added, use a privacy-friendly, cookie-light tool such as [Plausible](https://plausible.io) or [Umami](https://umami.is), and exclude form field values. **Sentry** (or similar) can watch for form and upload failures in production. Both are optional for v1 and should be decided before launch, not assumed.
+v1 includes both: **[Umami](https://umami.is)** for privacy-friendly analytics (Hobby cloud is enough at launch; exclude form field values), and **Sentry** (or similar) for form and upload failures in production.
 
 ## What we are not choosing now
 
@@ -94,23 +94,31 @@ If analytics are added, use a privacy-friendly, cookie-light tool such as [Plaus
 - Mobile native apps.
 - A separate microservices platform.
 
+## Decided facts
+
+| Fact | Decision |
+| --- | --- |
+| Early-bird | Still offered at launch (first 3 at HK$4,250 with IG post + testimonial) |
+| Notify inbox | Default `faworkshop18@gmail.com` — **configurable** via env |
+| From address | Default `hello@nuttyfelt.com` — **configurable** via env |
+| Hosting | **Vercel** + **Neon** Postgres + **Cloudflare R2** |
+| v1 artist intake | **Email only** (signed photo links) until phase 2 admin |
+| Analytics | **Umami** (Hobby cloud fine for v1); exclude form field values |
+| Error monitoring | Yes — e.g. Sentry for form/upload failures |
+| Production domain | TBC |
+
 ## Open decisions
 
-These do not block agreeing the overall stack, but should be settled before or during implementation:
-
-1. Production domain and DNS.
-2. Studio notification email address, and the from-address / domain used to send mail.
-3. Whether early-bird pricing (first 3 clients at HK$4,250) is still offered when the site launches.
-4. Vercel + R2 as the default, versus hosting the app on Cloudflare as well.
-5. Neon versus Supabase for Postgres (and later admin auth).
-6. Whether v1 should include a minimal password-protected request list, or stay email-only until phase 2.
-7. Analytics and error monitoring, if any.
+1. Production domain and DNS (and Resend domain verification for sending as `hello@nuttyfelt.com`).
+2. Sentry project setup — during implementation.
+3. Phase 2 admin auth vendor (Auth.js / Clerk / Supabase Auth) — decide when starting phase 2.
 
 ## Suggested implementation order (after UI/UX is agreed)
 
 See [ui-ux.md](ui-ux.md) for visual direction, tokens, and page compositions.
 
-1. App skeleton: Next.js, TypeScript, next-intl, static pages with bilingual copy and JSON-LD.
+1. ~~App skeleton: Next.js, TypeScript, next-intl, static pages with bilingual copy~~ — done (JSON-LD / `llms.txt` still to add).
 2. Direct-upload form, Postgres request records, and transactional email.
 3. Privacy review: no public leakage of private fields; signed, expiring photo links.
-4. Phase 2 admin portal for commissions plus Works / Home content management.
+4. Umami + Sentry wiring.
+5. Phase 2 admin portal for commissions plus Works / Home content management.
