@@ -1,7 +1,7 @@
 [build]
 builder = "NIXPACKS"
-# Nixpacks already runs install; only build here (avoids npm ci EBUSY on cache mounts).
-buildCommand = "npm run build"
+# Nixpacks already runs install. Webpack build avoids Turbopack Google-font failures on Railway.
+buildCommand = "npx next build --webpack"
 
 [deploy]
 startCommand = "npm run start"
