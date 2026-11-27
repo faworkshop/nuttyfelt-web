@@ -117,6 +117,7 @@
     "uploading": "Uploading…",
     "successTitle": "We received your request",
     "successBody": "Check your email for confirmation. We aim to reply within three days on photos and the scheduled month.",
+    "successRef": "Reference no.",
     "successNote": "Payment stays off-site later via FPS, PayMe, or PayPal after we confirm.",
     "addFiles": "Choose photos",
     "remove": "Remove",

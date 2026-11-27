@@ -1,12 +1,22 @@
 import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
+import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
-export default async function HomePage({ params }: Props) {
+export default function HomePage({ params }: Props) {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <HomeContent params={params} />
+    </Suspense>
+  );
+}
+
+async function HomeContent({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
@@ -28,6 +38,7 @@ export default async function HomePage({ params }: Props) {
               width={448}
               height={96}
               className="brand-logo-lg"
+              style={{ width: "auto", height: "auto" }}
               priority
             />
             <h1 className="mt-5 font-display text-2xl font-medium leading-snug text-ink md:text-3xl">

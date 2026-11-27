@@ -5,13 +5,16 @@
   "scripts": {
     "dev": "next dev --port 3001",
     "build": "next build",
-    "start": "next start",
+    "start": "next start --hostname 0.0.0.0",
     "lint": "eslint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "r2:cors": "node scripts/apply-r2-cors.mjs"
+    "r2:cors": "node scripts/apply-r2-cors.mjs",
+    "r2:cleanup-pending": "node scripts/cleanup-pending-uploads.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1178.0",
@@ -26,6 +29,7 @@
     "resend": "^6.40.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/turbopack": "4.3.3",
     "@types/node": "^20",
     "@types/react": "^19",

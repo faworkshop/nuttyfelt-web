@@ -1,10 +1,20 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Suspense } from "react";
 import { CommissionForm } from "@/components/CommissionForm";
+import { PageLoading } from "@/components/PageLoading";
 import { Link } from "@/i18n/navigation";
 
 type Props = { params: Promise<{ locale: string }> };
 
-export default async function CommissionPage({ params }: Props) {
+export default function CommissionPage({ params }: Props) {
+  return (
+    <Suspense fallback={<PageLoading />}>
+      <CommissionContent params={params} />
+    </Suspense>
+  );
+}
+
+async function CommissionContent({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("commission");
@@ -21,11 +31,10 @@ export default async function CommissionPage({ params }: Props) {
         >
           {t("processLink")}
         </Link>
-        <p className="mt-6 rounded-md border border-line bg-wool px-4 py-3 font-ui text-xs text-ink-muted">
-          {t("prototypeNote")}
-        </p>
         <div className="mt-10">
-          <CommissionForm />
+          <Suspense fallback={<PageLoading />}>
+            <CommissionForm />
+          </Suspense>
         </div>
       </div>
     </section>
