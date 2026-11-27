@@ -1,0 +1,264 @@
+@import "tailwindcss";
+
+/* Tokens aligned to brand logo: nut brown #482818, gold #C8A048, banner black */
+@theme {
+  --color-paper: #f5f0e6;
+  --color-mist: #e8e0d2;
+  --color-ink: #482818;
+  --color-ink-muted: #6b5344;
+  --color-brass: #c8a048;
+  --color-brass-deep: #a88430;
+  --color-wool: #faf7f1;
+  --color-line: #d9d0c2;
+  --color-danger: #8b3a2f;
+  --color-success: #3f5d4a;
+
+  --font-display: "Fraunces", "Noto Serif HK", "Noto Serif TC", serif;
+  --font-body: "Source Serif 4", "Noto Serif HK", "Noto Serif TC", serif;
+  --font-ui: "Figtree", "Noto Sans TC", sans-serif;
+
+  --animate-rise: rise 0.9s ease-out both;
+  --animate-fade: fade 1s ease-out both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-drift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-body antialiased;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(250, 247, 241, 0.95), transparent 50%),
+      radial-gradient(ellipse at 80% 15%, rgba(200, 160, 72, 0.08), transparent 42%),
+      linear-gradient(180deg, #f5f0e6 0%, #efe6d8 100%);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    z-index: 50;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--color-brass) 40%, white);
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brass);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .site-shell {
+    @apply relative z-10 min-h-screen flex flex-col;
+  }
+
+  .nav-link {
+    @apply font-ui text-sm tracking-wide text-ink-muted hover:text-ink;
+  }
+
+  .nav-link[aria-current="page"] {
+    @apply text-ink;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-brass px-5 py-3 font-ui text-sm font-semibold text-ink transition-colors duration-200 hover:bg-brass-deep;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-md border border-line bg-transparent px-5 py-3 font-ui text-sm font-medium text-ink transition-colors duration-200 hover:border-brass hover:text-ink;
+  }
+
+  .section-pad {
+    @apply px-5 py-16 md:px-10 md:py-24 lg:px-16;
+  }
+
+  .measure {
+    @apply mx-auto max-w-xl;
+  }
+
+  .measure-wide {
+    @apply mx-auto max-w-3xl;
+  }
+
+  .eyebrow {
+    @apply font-ui text-xs uppercase tracking-[0.18em] text-brass-deep;
+  }
+
+  .page-title {
+    @apply font-display text-3xl font-medium tracking-tight text-ink md:text-4xl;
+  }
+
+  .section-title {
+    @apply font-display text-2xl font-medium tracking-tight text-ink md:text-3xl;
+  }
+
+  .lede {
+    @apply mt-4 text-lg leading-relaxed text-ink-muted;
+  }
+
+  .field {
+    @apply flex flex-col gap-2;
+  }
+
+  .field label {
+    @apply font-ui text-sm font-medium text-ink;
+  }
+
+  .field .hint {
+    @apply font-ui text-xs leading-relaxed text-ink-muted;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    @apply w-full rounded-md border border-line bg-wool px-3 py-3 font-ui text-base text-ink placeholder:text-ink-muted/60;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    @apply border-brass outline-none ring-2 ring-brass/30;
+  }
+
+  .photo-frame {
+    @apply relative overflow-hidden bg-mist;
+  }
+
+  .photo-placeholder {
+    background:
+      radial-gradient(circle at 50% 42%, rgba(200, 160, 72, 0.4) 0%, rgba(200, 160, 72, 0.12) 28%, transparent 42%),
+      radial-gradient(ellipse at 50% 48%, #c4b49a 0%, #8a6e4e 38%, #482818 78%),
+      linear-gradient(165deg, #d8cbb8, #a89070);
+  }
+
+  .photo-placeholder::after {
+    content: "";
+    position: absolute;
+    inset: 18% 28% 28%;
+    border-radius: 50% 50% 45% 45%;
+    background:
+      radial-gradient(circle at 35% 35%, #faf7f1, #d2c4b0 45%, #6b5344 100%);
+    box-shadow: inset 0 0 20px rgba(72, 40, 24, 0.2);
+    opacity: 0.9;
+  }
+
+  .halo-ring {
+    position: absolute;
+    inset: 12% 18%;
+    border: 3px solid color-mix(in srgb, var(--color-brass) 85%, white);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--color-ink) 35%, transparent),
+      inset 0 0 18px rgba(200, 160, 72, 0.28);
+    pointer-events: none;
+  }
+
+  .brand-logo {
+    display: block;
+    height: 2.25rem;
+    width: auto;
+  }
+
+  @media (min-width: 768px) {
+    .brand-logo {
+      height: 2.75rem;
+    }
+  }
+
+  .brand-logo-lg {
+    display: block;
+    height: auto;
+    width: min(100%, 28rem);
+    max-height: 5.5rem;
+  }
+
+  .hero-media {
+    animation: hero-drift 4.5s ease-out both;
+  }
+
+  .rise {
+    animation: var(--animate-rise);
+  }
+
+  .fade-in {
+    animation: var(--animate-fade);
+  }
+
+  .stagger > * {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s ease;
+  }
+
+  .stagger.is-visible > * {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stagger.is-visible > *:nth-child(1) {
+    transition-delay: 0.05s;
+  }
+  .stagger.is-visible > *:nth-child(2) {
+    transition-delay: 0.15s;
+  }
+  .stagger.is-visible > *:nth-child(3) {
+    transition-delay: 0.25s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-media,
+    .rise,
+    .fade-in {
+      animation: none;
+    }
+
+    .stagger > * {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}

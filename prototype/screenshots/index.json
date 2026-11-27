@@ -1,0 +1,42 @@
+{
+  "generatedAt": "2026-11-27T03:58:21.301Z",
+  "base": "http://localhost:5173",
+  "shots": [
+    {
+      "theme": "wool-brass",
+      "name": "home-mobile",
+      "path": "/",
+      "width": 390,
+      "height": 844,
+      "fullPage": true,
+      "file": "wool-brass/home-mobile.png"
+    },
+    {
+      "theme": "wool-brass",
+      "name": "home-desktop",
+      "path": "/",
+      "width": 1440,
+      "height": 900,
+      "fullPage": false,
+      "file": "wool-brass/home-desktop.png"
+    },
+    {
+      "theme": "wool-brass",
+      "name": "commission-mobile",
+      "path": "/commission.html",
+      "width": 390,
+      "height": 844,
+      "fullPage": true,
+      "file": "wool-brass/commission-mobile.png"
+    },
+    {
+      "theme": "wool-brass",
+      "name": "works-desktop",
+      "path": "/works.html",
+      "width": 1440,
+      "height": 900,
+      "fullPage": false,
+      "file": "wool-brass/works-desktop.png"
+    }
+  ]
+}

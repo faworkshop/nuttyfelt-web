@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>訂製 · nuttyfelt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+HK:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body data-page="commission">
+    <div class="site-shell">
+      <header data-header class="relative z-30"></header>
+
+      <main class="flex-1">
+        <section class="section-pad !pb-8">
+          <div class="measure">
+            <p class="eyebrow">Commission</p>
+            <h1 class="page-title mt-3" data-copy="commission.title">訂製表格</h1>
+            <p class="lede" data-copy="commission.lede">
+              無需 Google 登入。請先閱讀落單需知；提交後我們目標三日內回覆。
+            </p>
+            <a class="mt-4 inline-flex font-ui text-sm text-brass-deep underline-offset-4 hover:underline" href="/process.html" data-copy="commission.processLink">閱讀落單需知</a>
+            <p class="mt-6 rounded-md border border-line bg-wool px-4 py-3 font-ui text-xs text-ink-muted" data-copy="commission.prototypeNote">
+              原型：上載僅模擬進度，不會真正送出。
+            </p>
+          </div>
+        </section>
+
+        <section class="px-5 pb-20 md:px-10 lg:px-16">
+          <div class="measure">
+            <div hidden data-success class="fade-in rounded-md border border-line bg-wool px-5 py-10">
+              <h2 class="font-display text-2xl" data-copy="commission.successTitle">已收到你的申請</h2>
+              <p class="mt-4 leading-relaxed text-ink-muted" data-copy="commission.successBody">
+                請查看電郵確認。我們目標三日內回覆照片是否足夠，以及預計檔期。
+              </p>
+              <p class="mt-4 font-ui text-sm text-ink-muted" data-copy="commission.successNote">
+                付款會在確認後以轉數快、PayMe 或 PayPal 另行處理。
+              </p>
+              <a class="btn-secondary mt-8" href="/index.html">nuttyfelt</a>
+            </div>
+
+            <form data-commission-form class="space-y-14" novalidate>
+              <!-- Contact -->
+              <fieldset class="space-y-5">
+                <legend class="font-display text-xl" data-copy="commission.sectionContact">聯絡資料</legend>
+                <div class="field">
+                  <label for="email" data-copy="commission.email">電郵</label>
+                  <input id="email" name="email" type="email" required autocomplete="email" />
+                </div>
+                <div class="field">
+                  <label for="name" data-copy="commission.name">稱呼</label>
+                  <input id="name" name="name" type="text" required autocomplete="nickname" />
+                </div>
+                <div class="field">
+                  <label for="instagram" data-copy="commission.instagram">Instagram 帳號</label>
+                  <input id="instagram" name="instagram" type="text" required placeholder="@" />
+                </div>
+                <div class="field">
+                  <label for="whatsapp" data-copy="commission.whatsapp">WhatsApp（海外可填 /）</label>
+                  <input id="whatsapp" name="whatsapp" type="text" required />
+                </div>
+                <div class="field">
+                  <label for="location" data-copy="commission.location">地區</label>
+                  <select id="location" name="location" required data-location>
+                    <option value="hk" data-copy="commission.locationHk">香港</option>
+                    <option value="other" data-copy="commission.locationOther">其他（請填國家／地區）</option>
+                  </select>
+                </div>
+                <div class="field" data-country-field hidden>
+                  <label for="country" data-copy="commission.country">國家／地區</label>
+                  <input id="country" name="country" type="text" />
+                </div>
+              </fieldset>
+
+              <!-- Cat -->
+              <fieldset class="space-y-5 border-t border-line pt-10">
+                <legend class="font-display text-xl" data-copy="commission.sectionCat">關於貓貓</legend>
+                <div class="field">
+                  <label for="catName" data-copy="commission.catName">貓的名字</label>
+                  <input id="catName" name="catName" type="text" required />
+                </div>
+                <div class="field">
+                  <label for="coat" data-copy="commission.coat">毛長／光環尺寸</label>
+                  <select id="coat" name="coat" required>
+                    <option value="short" data-copy="commission.coatShort">短毛（13 cm）</option>
+                    <option value="long" data-copy="commission.coatLong">長毛（15 cm）</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="features" data-copy="commission.features">最想保留的特徵</label>
+                  <textarea id="features" name="features" rows="4" required></textarea>
+                </div>
+                <div class="field">
+                  <label for="found" data-copy="commission.found">怎樣認識 nuttyfelt（可選）</label>
+                  <select id="found" name="found">
+                    <option value="">—</option>
+                    <option value="ig">Instagram</option>
+                    <option value="threads">Threads</option>
+                    <option value="friend">Friend</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="breed" data-copy="commission.breed">性別／品種（可選）</label>
+                  <input id="breed" name="breed" type="text" />
+                </div>
+                <div class="field">
+                  <label for="hopeDate" data-copy="commission.hopeDate">希望完成的日子（可選）</label>
+                  <input id="hopeDate" name="hopeDate" type="text" />
+                </div>
+                <div class="field">
+                  <label for="stories" data-copy="commission.stories">想分享的故事（可選）</label>
+                  <textarea id="stories" name="stories" rows="3"></textarea>
+                </div>
+              </fieldset>
+
+              <!-- Photos -->
+              <fieldset class="space-y-8 border-t border-line pt-10">
+                <legend class="font-display text-xl" data-copy="commission.sectionPhotos">參考照片</legend>
+
+                <div class="rounded-md border border-line bg-wool p-4" data-upload>
+                  <div class="field">
+                    <label data-copy="commission.photosBasic">基本角度原圖（建議 8–10 張）</label>
+                    <p class="hint" data-copy="commission.photosBasicHint">
+                      正面、眼睛特寫、左、右、背、45°、俯視、仰視。同一自然光、原圖、無濾鏡。每組最多 10 張，每張最多 100 MB。
+                    </p>
+                    <label class="btn-secondary mt-2 cursor-pointer !inline-flex w-fit">
+                      <span data-copy="commission.addFiles">選擇照片</span>
+                      <input class="sr-only" type="file" accept="image/*" multiple />
+                    </label>
+                  </div>
+                  <div data-file-list class="mt-2"></div>
+                </div>
+
+                <div class="rounded-md border border-line bg-wool p-4" data-upload>
+                  <div class="field">
+                    <label data-copy="commission.photosExtra">代表正面照與花紋補充（可選）</label>
+                    <p class="hint" data-copy="commission.photosExtraHint">
+                      一張最佳正面，以及需要特別注意的花紋或斑塊。
+                    </p>
+                    <label class="btn-secondary mt-2 cursor-pointer !inline-flex w-fit">
+                      <span data-copy="commission.addFiles">選擇照片</span>
+                      <input class="sr-only" type="file" accept="image/*" multiple />
+                    </label>
+                  </div>
+                  <div data-file-list class="mt-2"></div>
+                </div>
+              </fieldset>
+
+              <!-- Private status -->
+              <fieldset class="space-y-5 border-t border-line pt-10">
+                <legend class="font-display text-xl" data-copy="commission.sectionStatus">貓貓現在…（可選、絕不公開）</legend>
+                <div class="field">
+                  <label for="status" data-copy="commission.statusLabel">狀態（僅供調整溝通語氣）</label>
+                  <select id="status" name="status">
+                    <option value="">—</option>
+                    <option value="with" data-copy="commission.statusWith">仍在身邊</option>
+                    <option value="passed" data-copy="commission.statusPassed">已經回到喵星</option>
+                    <option value="skip" data-copy="commission.statusSkip">不想說</option>
+                  </select>
+                  <p class="hint" data-copy="commission.statusHint">此欄絕不會公開、不會用於宣傳。</p>
+                </div>
+              </fieldset>
+
+              <!-- Consents -->
+              <fieldset class="space-y-5 border-t border-line pt-10">
+                <legend class="font-display text-xl" data-copy="commission.sectionConsents">同意事項</legend>
+                <label class="flex items-start gap-3 font-ui text-sm leading-relaxed">
+                  <input class="mt-1" type="checkbox" name="terms" required />
+                  <span data-copy="commission.agreeTerms">我已閱讀並同意落單需知</span>
+                </label>
+                <label class="flex items-start gap-3 font-ui text-sm leading-relaxed">
+                  <input class="mt-1" type="checkbox" name="handmade" required />
+                  <span data-copy="commission.agreeHandmade">我明白這是手作詮釋，不會與照片完全一樣</span>
+                </label>
+                <div class="field">
+                  <p class="font-ui text-sm font-medium" data-copy="commission.publicity">宣傳同意（必須選擇一項才能接單）</p>
+                  <label class="mt-3 flex items-start gap-3 font-ui text-sm">
+                    <input class="mt-1" type="radio" name="publicity" value="tag" required />
+                    <span data-copy="commission.tagOk">同意分享，可以標註我</span>
+                  </label>
+                  <label class="mt-3 flex items-start gap-3 font-ui text-sm">
+                    <input class="mt-1" type="radio" name="publicity" value="no-tag" required />
+                    <span data-copy="commission.tagNo">同意分享，請不要標註我</span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <button class="btn-primary w-full md:w-auto" type="submit" data-copy="commission.submit">
+                提交訂製申請
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <footer data-footer></footer>
+    </div>
+    <script type="module" src="/src/commission.js"></script>
+  </body>
+</html>

@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nuttyfelt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Noto+Sans+TC:wght@400;500;600&family=Noto+Serif+HK:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body data-page="home">
+    <div class="site-shell">
+      <header data-header class="relative z-30"></header>
+
+      <main class="flex-1">
+        <!-- Hero: brand + one headline + lede + CTAs + full-bleed photo -->
+        <section class="relative min-h-[100svh] overflow-hidden">
+          <div class="absolute inset-0">
+            <div class="photo-frame photo-placeholder hero-media h-full w-full">
+              <div class="halo-ring"></div>
+            </div>
+            <div class="absolute inset-0 bg-gradient-to-t from-paper via-paper/75 to-paper/20 md:via-paper/55"></div>
+          </div>
+
+          <div class="relative z-10 flex min-h-[100svh] flex-col justify-end px-5 pb-14 pt-28 md:px-10 md:pb-20 lg:px-16">
+            <div class="max-w-xl">
+              <div class="rise">
+                <img
+                  class="brand-logo-lg"
+                  src="/brand/nuttyfelt-logo.png"
+                  alt="nuttyfelt"
+                  width="448"
+                  height="96"
+                />
+              </div>
+              <h1 class="rise mt-5 font-display text-2xl font-medium leading-snug text-ink md:text-3xl" style="animation-delay: 0.12s" data-copy="home.headline">
+                羊毛氈半身像，安在銅金光環上
+              </h1>
+              <p class="rise mt-4 max-w-md text-base leading-relaxed text-ink-muted md:text-lg" style="animation-delay: 0.22s" data-copy="home.lede">
+                為你的貓留下一件手作肖像：擬真半身、金屬光環、小畫架。
+              </p>
+              <div class="rise mt-8 flex flex-wrap gap-3" style="animation-delay: 0.32s">
+                <a class="btn-primary" href="/commission.html" data-copy="home.ctaPrimary">開始訂製</a>
+                <a class="btn-secondary" href="/works.html" data-copy="home.ctaSecondary">瀏覽作品</a>
+              </div>
+              <p class="rise mt-6 font-ui text-xs text-ink-muted/80" style="animation-delay: 0.4s" data-copy="home.photoNote">
+                作品照片佔位 · 稍後替換為工作室成品照
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- The halo -->
+        <section class="section-pad border-t border-line/60">
+          <div class="measure-wide grid items-center gap-10 md:grid-cols-2 md:gap-16">
+            <div>
+              <p class="eyebrow">Halo</p>
+              <h2 class="section-title mt-3" data-copy="home.haloTitle">光環呈現</h2>
+              <p class="lede" data-copy="home.haloBody">
+                不是相框。擬真半身固定在手工打磨的銅金光環上，附小畫架與護理蠟。
+              </p>
+              <a class="mt-6 inline-flex font-ui text-sm text-brass-deep underline-offset-4 hover:underline" href="/halo.html" data-copy="home.haloLink">了解光環</a>
+            </div>
+            <div class="photo-frame photo-placeholder aspect-[4/5]">
+              <div class="halo-ring"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Selected works -->
+        <section class="section-pad bg-mist/40">
+          <div class="mx-auto max-w-6xl">
+            <div class="max-w-xl">
+              <p class="eyebrow">Works</p>
+              <h2 class="section-title mt-3" data-copy="home.worksTitle">精選作品</h2>
+              <p class="lede" data-copy="home.worksBody">看看完成後的樣子與質感。</p>
+            </div>
+            <div class="stagger mt-12 grid gap-8 md:grid-cols-3" data-stagger>
+              <figure>
+                <div class="photo-frame photo-placeholder aspect-[4/5]">
+                  <div class="halo-ring"></div>
+                </div>
+                <figcaption class="mt-4 font-display text-lg" data-copy="home.workA">栗子</figcaption>
+              </figure>
+              <figure>
+                <div class="photo-frame photo-placeholder aspect-[4/5]">
+                  <div class="halo-ring"></div>
+                </div>
+                <figcaption class="mt-4 font-display text-lg" data-copy="home.workB">壹壹</figcaption>
+              </figure>
+              <figure>
+                <div class="photo-frame photo-placeholder aspect-[4/5]">
+                  <div class="halo-ring"></div>
+                </div>
+                <figcaption class="mt-4 font-display text-lg" data-copy="home.workC">作品示例</figcaption>
+              </figure>
+            </div>
+            <a class="mt-10 inline-flex font-ui text-sm text-brass-deep underline-offset-4 hover:underline" href="/works.html" data-copy="home.worksLink">全部作品</a>
+          </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="section-pad">
+          <div class="measure">
+            <p class="eyebrow">Process</p>
+            <h2 class="section-title mt-3" data-copy="home.howTitle">訂製流程</h2>
+            <p class="lede" data-copy="home.howBody">三步開始：參考照片、確認檔期與訂金、手工製作。</p>
+            <ol class="mt-10 space-y-6 border-t border-line pt-8 font-ui">
+              <li class="flex gap-4 text-base">
+                <span class="text-brass-deep">01</span>
+                <span data-copy="home.how1">上傳清晰原圖</span>
+              </li>
+              <li class="flex gap-4 text-base">
+                <span class="text-brass-deep">02</span>
+                <span data-copy="home.how2">確認月份與訂金</span>
+              </li>
+              <li class="flex gap-4 text-base">
+                <span class="text-brass-deep">03</span>
+                <span data-copy="home.how3">收到手作肖像</span>
+              </li>
+            </ol>
+            <a class="mt-8 inline-flex font-ui text-sm text-brass-deep underline-offset-4 hover:underline" href="/process.html" data-copy="home.howLink">閱讀落單需知</a>
+          </div>
+        </section>
+
+        <!-- Capacity -->
+        <section class="section-pad border-t border-line/60 bg-mist/30">
+          <div class="measure text-center">
+            <p class="font-display text-xl leading-relaxed md:text-2xl" data-copy="home.capacity">
+              目前約每月接受一件訂製，製作約需三至四星期。
+            </p>
+            <a class="btn-primary mt-8" href="/commission.html" data-copy="home.capacityCta">前往訂製表格</a>
+          </div>
+        </section>
+      </main>
+
+      <footer data-footer></footer>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
