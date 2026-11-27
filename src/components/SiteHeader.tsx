@@ -24,11 +24,6 @@ export function SiteHeader() {
   const otherLocale = locale === "en" ? "zh-Hant" : "en";
   const otherLabel = locale === "en" ? "中文" : "EN";
 
-  // Close when the route changes (covers soft nav from menu links).
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
-
   useEffect(() => {
     if (!open) return;
     const previous = document.body.style.overflow;
