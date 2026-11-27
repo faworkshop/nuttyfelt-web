@@ -4,13 +4,21 @@ import { getDb } from "@/db";
 import { commissionFiles, commissionRequests } from "@/db/schema";
 import { sendClientConfirmation, sendStudioNotification } from "@/lib/email";
 import { rateLimit } from "@/lib/rate-limit";
-import { getSignedDownloadUrl, headObject } from "@/lib/r2-objects";
+import {
+  copyObject,
+  deleteObject,
+  getSignedDownloadUrl,
+  headObject,
+} from "@/lib/r2-objects";
 import { toReferenceNo } from "@/lib/reference";
 import {
   MAX_FILES_PER_GROUP,
   MAX_UPLOAD_BYTES,
+  PENDING_PREFIX,
+  buildFinalObjectKey,
   isAllowedImageType,
   isUploadGroup,
+  pendingObjectName,
   type UploadGroup,
 } from "@/lib/uploads";
 
@@ -179,7 +187,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid file size" }, { status: 400 });
     }
 
-    const expectedPrefix = `commissions/pending/${uploadSessionId}/${group}/`;
+    const expectedPrefix = `${PENDING_PREFIX}${uploadSessionId}/${group}/`;
     if (!storageKey.startsWith(expectedPrefix) || storageKey.includes("..")) {
       return NextResponse.json({ error: "Invalid storage key" }, { status: 400 });
     }
@@ -262,9 +270,41 @@ export async function POST(request: NextRequest) {
       .returning({ id: commissionRequests.id });
 
     requestId = inserted.id;
+  } catch (error) {
+    console.error("Failed to store commission request", error);
+    return NextResponse.json(
+      { error: "Could not store request. Please try again." },
+      { status: 500 },
+    );
+  }
+
+  // Move objects out of pending/ so R2 lifecycle/cleanup can expire abandons only.
+  const promotedFiles: {
+    group: UploadGroup;
+    storageKey: string;
+    pendingKey: string;
+    originalFilename: string;
+    sizeBytes: number;
+    contentType: string;
+  }[] = [];
+
+  try {
+    for (const file of normalizedFiles) {
+      const finalKey = buildFinalObjectKey({
+        requestId,
+        group: file.group,
+        objectName: pendingObjectName(file.storageKey),
+      });
+      await copyObject(file.storageKey, finalKey);
+      promotedFiles.push({
+        ...file,
+        storageKey: finalKey,
+        pendingKey: file.storageKey,
+      });
+    }
 
     await db.insert(commissionFiles).values(
-      normalizedFiles.map((file) => ({
+      promotedFiles.map((file) => ({
         requestId,
         group: file.group,
         storageKey: file.storageKey,
@@ -274,15 +314,31 @@ export async function POST(request: NextRequest) {
       })),
     );
   } catch (error) {
-    console.error("Failed to store commission request", error);
+    console.error("Failed to promote commission files", requestId, error);
+    await db
+      .update(commissionRequests)
+      .set({
+        status: "failed",
+        failureReason: "storage_promote_failed",
+        updatedAt: new Date(),
+      })
+      .where(eq(commissionRequests.id, requestId));
     return NextResponse.json(
-      { error: "Could not store request. Please try again." },
+      { error: "Could not finalize uploads. Please try again." },
       { status: 500 },
     );
   }
 
+  for (const file of promotedFiles) {
+    try {
+      await deleteObject(file.pendingKey);
+    } catch (error) {
+      console.error("Failed to delete pending object", file.pendingKey, error);
+    }
+  }
+
   const fileLinks = await Promise.all(
-    normalizedFiles.map(async (file) => ({
+    promotedFiles.map(async (file) => ({
       group: file.group,
       filename: file.originalFilename,
       url: await getSignedDownloadUrl(file.storageKey),

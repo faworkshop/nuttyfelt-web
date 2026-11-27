@@ -1,6 +1,9 @@
 export const MAX_UPLOAD_BYTES = 100 * 1024 * 1024; // 100 MB
 export const MAX_FILES_PER_GROUP = 10;
 export const UPLOAD_URL_EXPIRES_IN = 15 * 60; // 15 minutes
+export const PENDING_PREFIX = "commissions/pending/";
+/** Abandoned pending objects older than this should be deleted (lifecycle + cleanup script). */
+export const PENDING_MAX_AGE_MS = 48 * 60 * 60 * 1000;
 
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
@@ -36,5 +39,20 @@ export function buildPendingObjectKey(input: {
   randomId: string;
 }): string {
   const safe = sanitizeFilename(input.filename);
-  return `commissions/pending/${input.uploadSessionId}/${input.group}/${input.randomId}-${safe}`;
+  return `${PENDING_PREFIX}${input.uploadSessionId}/${input.group}/${input.randomId}-${safe}`;
+}
+
+/** Final key after a request is accepted (outside pending/, safe from abandon cleanup). */
+export function buildFinalObjectKey(input: {
+  requestId: string;
+  group: UploadGroup;
+  /** Filename leaf from the pending object key (randomId-safeName). */
+  objectName: string;
+}): string {
+  const leaf = input.objectName.split(/[/\\]/).pop() || "upload";
+  return `commissions/${input.requestId}/${input.group}/${leaf}`;
+}
+
+export function pendingObjectName(storageKey: string): string {
+  return storageKey.split("/").pop() || "upload";
 }

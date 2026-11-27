@@ -9,7 +9,7 @@ Recommended starting stack for nuttyfelt-web. The aim is one small application a
 | Application | Next.js (App Router) and TypeScript | One repo can serve pre-rendered marketing pages, the form API, and a later admin area. Strong metadata, i18n, and structured-data support. |
 | UI styling | Tailwind CSS (when UI is implemented) | Fast to build a mobile-first, one-column layout. Not needed for this documentation pass. |
 | Internationalization | next-intl | First-class App Router support. Default locale `zh-Hant` (Hong Kong wording in copy), English at `/en`. |
-| Hosting | Vercel | Natural host for Next.js previews and production. Marketing pages can be statically generated. |
+| Hosting | **Railway** | Commercial-friendly Next.js hosting; keep Neon + R2 + Resend as external services. (Vercel Hobby disallows commercial use.) |
 | Database | PostgreSQL on Neon | Ordinary relational data, a generous free tier, and a good fit for low volume. |
 | Data access | Drizzle ORM | Lightweight, typed SQL that stays close to the database. Prisma is a fine alternative. |
 | File storage | Cloudflare R2 | S3-compatible, no egress fees, and suitable for private originals up to 100 MB each. |
@@ -101,7 +101,7 @@ v1 includes both: **[Umami](https://umami.is)** for privacy-friendly analytics (
 | Early-bird | Still offered at launch (first 3 at HK$4,250 with IG post + testimonial) |
 | Notify inbox | Default `faworkshop18@gmail.com` — **configurable** via env |
 | From address | Default `hello@nuttyfelt.com` — **configurable** via env |
-| Hosting | **Vercel** + **Neon** Postgres + **Cloudflare R2** |
+| Hosting | **Railway** + **Neon** Postgres + **Cloudflare R2** |
 | v1 artist intake | **Email only** (signed photo links) until phase 2 admin |
 | Analytics | **Umami** (Hobby cloud fine for v1); exclude form field values |
 | Error monitoring | Yes — e.g. Sentry for form/upload failures |

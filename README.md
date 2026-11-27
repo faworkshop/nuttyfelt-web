@@ -7,6 +7,7 @@ Public site and commission intake for nuttyfelt (Hong Kong handmade needle-felte
 - Next.js App Router + TypeScript
 - Tailwind CSS (Wool & gold tokens; no UI kit)
 - next-intl — default `zh-Hant` at `/`, English at `/en`
+- Hosting: **Railway** (see `railway.toml`)
 - Neon Postgres + Drizzle, Cloudflare R2, Resend (Umami + Sentry later)
 
 Product docs: `core-functions.md`, `architecture.md`, `tech-stack.md`, `ui-ux.md`.  
@@ -47,14 +48,36 @@ Browser uploads need bucket CORS. Object Read & Write tokens cannot set CORS via
 
 Optional (needs an Admin R2 token): `npm run r2:cors`
 
+### Pending upload cleanup (B9)
+
+On submit, files are copied from `commissions/pending/…` to `commissions/{requestId}/…` and the pending objects are deleted.
+
+Abandoned pending uploads (never submitted) should expire after ~48 hours:
+
+1. R2 → bucket → **Settings** → **Object lifecycle rules**
+2. Use `scripts/r2-lifecycle.json` (expire `commissions/pending/` after 2 days)
+3. Or run periodically: `npm run r2:cleanup-pending` (add `-- --dry-run` first)
+
 ## Commission submit
 
-`POST /api/commission` verifies uploaded R2 objects, inserts `commission_requests` + `commission_files`, then emails:
+`POST /api/commission` verifies uploaded R2 objects, promotes them out of `pending/`, inserts `commission_requests` + `commission_files`, then emails:
 
 - Studio (`NOTIFY_EMAIL`) — answers + 7-day signed photo links
-- Client — confirmation (no private living-status)
+- Client — confirmation with short `NF-` reference (no private living-status)
 
-Requires `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `EMAIL_FROM`. Until `nuttyfelt.com` is verified in Resend, set `EMAIL_FROM=onboarding@resend.dev`. That test sender can only deliver to your Resend account email (`NOTIFY_EMAIL`); client confirmations to other addresses are redirected there with a test-mode note. Restart `next dev` after changing `.env.local`.
+Requires `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `EMAIL_FROM`. After the domain shows **Verified** in Resend, set `EMAIL_FROM=hello@nuttyfelt.com`. Until then use `onboarding@resend.dev` (test sender only reaches your Resend account email; other client addresses are redirected there). Restart `next dev` after changing `.env.local`.
+
+## Deploy (Railway)
+
+```bash
+railway up -y
+```
+
+Set these variables on the Railway service (same names as `.env.example`):
+
+`DATABASE_URL`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT`, `RESEND_API_KEY`, `NOTIFY_EMAIL`, `EMAIL_FROM`
+
+After the first public URL exists, add that origin to R2 CORS (`scripts/r2-cors.json`).
 
 ## Scripts
 
@@ -69,3 +92,4 @@ Requires `RESEND_API_KEY`, `NOTIFY_EMAIL`, and `EMAIL_FROM`. Until `nuttyfelt.co
 | `npm run db:migrate` | Apply migrations |
 | `npm run db:studio` | Drizzle Studio |
 | `npm run r2:cors` | Apply R2 CORS for local uploads |
+| `npm run r2:cleanup-pending` | Delete abandoned pending uploads older than 48h |

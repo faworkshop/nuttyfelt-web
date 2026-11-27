@@ -1,0 +1,17 @@
+{
+  "Rules": [
+    {
+      "ID": "expire-abandoned-pending-uploads",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "commissions/pending/"
+      },
+      "Expiration": {
+        "Days": 2
+      },
+      "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 1
+      }
+    }
+  ]
+}
