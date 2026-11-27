@@ -1,19 +1,59 @@
 "use client";
 
-import { useTranslations } from "next-intl";
-import { FormEvent, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { FormEvent, useId, useMemo, useState } from "react";
 import { Link } from "@/i18n/navigation";
+import { uploadFileToR2 } from "@/lib/client-upload";
+import {
+  ALLOWED_IMAGE_TYPES,
+  MAX_FILES_PER_GROUP,
+  MAX_UPLOAD_BYTES,
+  isAllowedImageType,
+  type UploadGroup,
+} from "@/lib/uploads";
 
 const TOTAL_STEPS = 4;
 
+const ACCEPT_IMAGES = ALLOWED_IMAGE_TYPES.join(",");
+
+type FileStatus = "queued" | "uploading" | "done" | "error";
+
+type TrackedFile = {
+  id: string;
+  file: File;
+  group: UploadGroup;
+  status: FileStatus;
+  progress: number;
+  storageKey?: string;
+  error?: string;
+};
+
+function formatMb(bytes: number) {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function newFileId() {
+  return crypto.randomUUID();
+}
+
 export function CommissionForm() {
   const t = useTranslations("commission");
+  const locale = useLocale();
+  const uploadSessionId = useMemo(() => crypto.randomUUID(), []);
+  const basicInputId = useId();
+  const extraInputId = useId();
+
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(false);
   const [location, setLocation] = useState("hk");
-  const [basicCount, setBasicCount] = useState(0);
+  const [files, setFiles] = useState<TrackedFile[]>([]);
   const [photoError, setPhotoError] = useState(false);
+  const [fileMessage, setFileMessage] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const basicFiles = files.filter((f) => f.group === "basic");
+  const extraFiles = files.filter((f) => f.group === "extra");
 
   const titles = [
     t("sectionContact"),
@@ -22,12 +62,67 @@ export function CommissionForm() {
     t("stepConfirm"),
   ];
 
+  function updateFile(id: string, patch: Partial<TrackedFile>) {
+    setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, ...patch } : f)));
+  }
+
+  function removeFile(id: string) {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+    setPhotoError(false);
+    setFileMessage(null);
+  }
+
+  function addFiles(group: UploadGroup, list: FileList | null) {
+    if (!list?.length) return;
+
+    const existing = files.filter((f) => f.group === group);
+    const room = MAX_FILES_PER_GROUP - existing.length;
+    if (room <= 0) {
+      setFileMessage(t("tooManyFiles"));
+      return;
+    }
+
+    const incoming = [...list];
+    const accepted: TrackedFile[] = [];
+    let message: string | null = null;
+
+    for (const file of incoming) {
+      if (accepted.length >= room) {
+        message = t("tooManyFiles");
+        break;
+      }
+      if (!file.type || !isAllowedImageType(file.type)) {
+        message = t("unsupportedType");
+        continue;
+      }
+      if (file.size <= 0 || file.size > MAX_UPLOAD_BYTES) {
+        message = t("fileTooLarge");
+        continue;
+      }
+      accepted.push({
+        id: newFileId(),
+        file,
+        group,
+        status: "queued",
+        progress: 0,
+      });
+    }
+
+    if (accepted.length) {
+      setFiles((prev) => [...prev, ...accepted]);
+      setPhotoError(false);
+    }
+    setFileMessage(message);
+  }
+
   function validateStep(n: number, form: HTMLFormElement) {
     const panel = form.querySelector<HTMLElement>(`[data-step-panel="${n}"]`);
     if (!panel) return false;
-    const fields = [...panel.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>(
-      "input, select, textarea",
-    )].filter((el) => el.type !== "file" && !el.disabled);
+    const fields = [
+      ...panel.querySelectorAll<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >("input, select, textarea"),
+    ].filter((el) => el.type !== "file" && !el.disabled);
 
     for (const el of fields) {
       if (!el.checkValidity()) {
@@ -37,7 +132,7 @@ export function CommissionForm() {
       }
     }
 
-    if (n === 3 && basicCount < 1) {
+    if (n === 3 && basicFiles.length < 1) {
       setPhotoError(true);
       return false;
     }
@@ -45,13 +140,174 @@ export function CommissionForm() {
     return true;
   }
 
+  async function uploadTrackedFile(
+    item: TrackedFile,
+  ): Promise<{ storageKey: string } | null> {
+    if (item.status === "done" && item.storageKey) {
+      return { storageKey: item.storageKey };
+    }
+
+    updateFile(item.id, { status: "uploading", progress: 0, error: undefined });
+    try {
+      const { storageKey } = await uploadFileToR2(item.file, {
+        group: item.group,
+        uploadSessionId,
+        onProgress: (ratio) => updateFile(item.id, { progress: ratio }),
+      });
+      updateFile(item.id, {
+        status: "done",
+        progress: 1,
+        storageKey,
+        error: undefined,
+      });
+      return { storageKey };
+    } catch {
+      updateFile(item.id, {
+        status: "error",
+        error: t("uploadFailed"),
+      });
+      return null;
+    }
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     if (!validateStep(step, form)) return;
+
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 700));
-    setDone(true);
+    setSubmitError(null);
+
+    const uploaded: {
+      group: UploadGroup;
+      storageKey: string;
+      originalFilename: string;
+      sizeBytes: number;
+      contentType: string;
+    }[] = [];
+
+    for (const item of files) {
+      const result = await uploadTrackedFile(item);
+      if (!result) {
+        setSubmitting(false);
+        setSubmitError(t("uploadFailed"));
+        return;
+      }
+      uploaded.push({
+        group: item.group,
+        storageKey: result.storageKey,
+        originalFilename: item.file.name,
+        sizeBytes: item.file.size,
+        contentType: item.file.type,
+      });
+    }
+
+    const data = new FormData(form);
+    const livingRaw = String(data.get("status") ?? "").trim();
+    const payload = {
+      locale,
+      email: String(data.get("email") ?? "").trim(),
+      displayName: String(data.get("name") ?? "").trim(),
+      instagram: String(data.get("instagram") ?? "").trim(),
+      whatsapp: String(data.get("whatsapp") ?? "").trim(),
+      location: String(data.get("location") ?? "").trim(),
+      country: String(data.get("country") ?? "").trim() || null,
+      catName: String(data.get("catName") ?? "").trim(),
+      coatLength: String(data.get("coat") ?? "").trim(),
+      features: String(data.get("features") ?? "").trim(),
+      foundVia: String(data.get("found") ?? "").trim() || null,
+      sexBreed: String(data.get("breed") ?? "").trim() || null,
+      hopeDate: String(data.get("hopeDate") ?? "").trim() || null,
+      stories: String(data.get("stories") ?? "").trim() || null,
+      livingStatus: livingRaw || null,
+      agreedTerms: data.get("terms") === "on",
+      agreedHandmade: data.get("handmade") === "on",
+      publicity: String(data.get("publicity") ?? "").trim(),
+      uploadSessionId,
+      files: uploaded,
+    };
+
+    try {
+      const response = await fetch("/api/commission", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+      };
+
+      if (!response.ok) {
+        setSubmitting(false);
+        setSubmitError(result.error || t("submitFailed"));
+        return;
+      }
+
+      setDone(true);
+    } catch {
+      setSubmitError(t("submitFailed"));
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function renderFileList(group: UploadGroup) {
+    const list = group === "basic" ? basicFiles : extraFiles;
+    if (!list.length) return null;
+
+    return (
+      <div className="mt-3 space-y-0">
+        {list.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center justify-between gap-3 border-b border-line/70 py-3 font-ui text-sm"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-ink">{item.file.name}</p>
+              <p className="text-xs text-ink-muted">{formatMb(item.file.size)}</p>
+              {item.status === "uploading" || item.status === "done" ? (
+                <div className="mt-2 h-1 overflow-hidden rounded bg-mist">
+                  <div
+                    className="h-full bg-brass transition-all duration-300"
+                    style={{ width: `${Math.round(item.progress * 100)}%` }}
+                  />
+                </div>
+              ) : null}
+              {item.status === "error" ? (
+                <p className="mt-1 text-xs text-danger">
+                  {item.error || t("uploadFailed")}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex shrink-0 items-center gap-3">
+              {item.status === "error" && !submitting ? (
+                <button
+                  type="button"
+                  className="text-ink-muted hover:text-ink"
+                  onClick={() => {
+                    void uploadTrackedFile(item).then((result) => {
+                      if (!result) setSubmitError(t("uploadFailed"));
+                      else setSubmitError(null);
+                    });
+                  }}
+                >
+                  {t("retry")}
+                </button>
+              ) : null}
+              {!submitting && item.status !== "uploading" ? (
+                <button
+                  type="button"
+                  className="text-ink-muted hover:text-danger"
+                  onClick={() => removeFile(item.id)}
+                >
+                  {t("remove")}
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   if (done) {
@@ -176,39 +432,48 @@ export function CommissionForm() {
       <fieldset className="space-y-8" data-step-panel="3" hidden={step !== 3}>
         <div className="rounded-md border border-line bg-wool p-4">
           <div className="field">
-            <label htmlFor="photosBasic">{t("photosBasic")}</label>
+            <label htmlFor={basicInputId}>{t("photosBasic")}</label>
             <p className="hint">{t("photosBasicHint")}</p>
             <input
-              id="photosBasic"
-              name="photosBasic"
+              id={basicInputId}
               className="mt-2 font-ui text-sm"
               type="file"
-              accept="image/*"
+              accept={ACCEPT_IMAGES}
               multiple
+              disabled={submitting}
               onChange={(e) => {
-                setBasicCount(e.target.files?.length ?? 0);
-                setPhotoError(false);
+                addFiles("basic", e.target.files);
+                e.target.value = "";
               }}
             />
           </div>
+          {renderFileList("basic")}
           {photoError ? (
             <p className="mt-2 font-ui text-xs text-danger">{t("photosRequired")}</p>
           ) : null}
         </div>
         <div className="rounded-md border border-line bg-wool p-4">
           <div className="field">
-            <label htmlFor="photosExtra">{t("photosExtra")}</label>
+            <label htmlFor={extraInputId}>{t("photosExtra")}</label>
             <p className="hint">{t("photosExtraHint")}</p>
             <input
-              id="photosExtra"
-              name="photosExtra"
+              id={extraInputId}
               className="mt-2 font-ui text-sm"
               type="file"
-              accept="image/*"
+              accept={ACCEPT_IMAGES}
               multiple
+              disabled={submitting}
+              onChange={(e) => {
+                addFiles("extra", e.target.files);
+                e.target.value = "";
+              }}
             />
           </div>
+          {renderFileList("extra")}
         </div>
+        {fileMessage ? (
+          <p className="font-ui text-xs text-danger">{fileMessage}</p>
+        ) : null}
       </fieldset>
 
       <fieldset className="space-y-8" data-step-panel="4" hidden={step !== 4}>
@@ -247,6 +512,53 @@ export function CommissionForm() {
             </label>
           </div>
         </div>
+        {(submitting || submitError) && files.length > 0 ? (
+          <div className="space-y-0 border-t border-line pt-6">
+            <p className="mb-2 font-ui text-sm text-ink-muted">
+              {submitting ? t("uploading") : t("uploadFailed")}
+            </p>
+            {files.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between gap-3 border-b border-line/70 py-3 font-ui text-sm"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-ink">{item.file.name}</p>
+                  {(item.status === "uploading" || item.status === "done") && (
+                    <div className="mt-2 h-1 overflow-hidden rounded bg-mist">
+                      <div
+                        className="h-full bg-brass transition-all duration-300"
+                        style={{ width: `${Math.round(item.progress * 100)}%` }}
+                      />
+                    </div>
+                  )}
+                  {item.status === "error" ? (
+                    <p className="mt-1 text-xs text-danger">
+                      {item.error || t("uploadFailed")}
+                    </p>
+                  ) : null}
+                </div>
+                {item.status === "error" && !submitting ? (
+                  <button
+                    type="button"
+                    className="shrink-0 text-ink-muted hover:text-ink"
+                    onClick={() => {
+                      void uploadTrackedFile(item).then((result) => {
+                        if (!result) setSubmitError(t("uploadFailed"));
+                        else setSubmitError(null);
+                      });
+                    }}
+                  >
+                    {t("retry")}
+                  </button>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {submitError ? (
+          <p className="font-ui text-sm text-danger">{submitError}</p>
+        ) : null}
       </fieldset>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-line pt-6">
@@ -254,6 +566,7 @@ export function CommissionForm() {
           <button
             className="btn-secondary"
             type="button"
+            disabled={submitting}
             onClick={() => setStep((s) => s - 1)}
           >
             {t("back")}

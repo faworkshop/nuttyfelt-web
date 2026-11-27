@@ -120,6 +120,12 @@
     "successNote": "Payment stays off-site later via FPS, PayMe, or PayPal after we confirm.",
     "addFiles": "Choose photos",
     "remove": "Remove",
+    "retry": "Retry",
+    "uploadFailed": "Upload failed. Check your connection and retry.",
+    "submitFailed": "Could not submit the request. Please try again.",
+    "fileTooLarge": "Each file must be 100 MB or smaller.",
+    "tooManyFiles": "Up to 10 files per group.",
+    "unsupportedType": "Use JPEG, PNG, WebP, HEIC, HEIF, or GIF.",
     "prototypeNote": "Prototype: uploads are simulated and nothing is sent."
   }
 }

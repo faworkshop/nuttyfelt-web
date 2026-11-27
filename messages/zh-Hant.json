@@ -120,6 +120,12 @@
     "successNote": "付款會在確認後以轉數快、PayMe 或 PayPal 另行處理。",
     "addFiles": "選擇照片",
     "remove": "移除",
+    "retry": "重試",
+    "uploadFailed": "上載失敗。請檢查網絡後重試。",
+    "submitFailed": "未能提交申請。請再試一次。",
+    "fileTooLarge": "每張檔案不可超過 100 MB。",
+    "tooManyFiles": "每組最多 10 張。",
+    "unsupportedType": "請使用 JPEG、PNG、WebP、HEIC、HEIF 或 GIF。",
     "prototypeNote": "原型：上載僅模擬進度，不會真正送出。"
   }
 }
