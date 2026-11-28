@@ -119,7 +119,7 @@ v1 is successful if a client can complete a request on a phone, the studio recei
 
 ## Phase 2: admin portal
 
-A private, signed-in admin portal for the artist. It sits behind the public site and is not required to launch v1. It has two jobs: manage commissions, and manage the public Works showcase and Home page content.
+A private, signed-in admin portal for the artist (**Clerk** auth). Desktop and mobile. It sits behind the public site. It has two jobs: manage commissions, and manage the public Works showcase and Home page content.
 
 ### Commission details and status
 

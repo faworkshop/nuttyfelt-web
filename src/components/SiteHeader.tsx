@@ -4,9 +4,12 @@ import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
-import type { AppPathname } from "@/i18n/routing";
+import type { StaticAppPathname } from "@/i18n/routing";
 
-const navItems: { href: AppPathname; key: "home" | "works" | "halo" | "process" | "about" | "faq" }[] = [
+const navItems: {
+  href: StaticAppPathname;
+  key: "home" | "works" | "halo" | "process" | "about" | "faq";
+}[] = [
   { href: "/", key: "home" },
   { href: "/works", key: "works" },
   { href: "/halo", key: "halo" },
@@ -50,7 +53,7 @@ export function SiteHeader() {
           </Link>
           <div className="flex items-center gap-3 md:gap-4">
             <Link
-              href={pathname}
+              href={pathname as StaticAppPathname}
               locale={otherLocale}
               className="font-ui text-sm text-ink-muted hover:text-ink"
             >

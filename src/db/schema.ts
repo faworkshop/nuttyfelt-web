@@ -1,6 +1,7 @@
 import {
   bigint,
   boolean,
+  integer,
   pgEnum,
   pgTable,
   text,
@@ -23,12 +24,23 @@ export const livingStatusEnum = pgEnum("living_status", [
   "skip",
 ]);
 
+/** Artist-managed lifecycle. `failed` is intake/storage/email failure. */
 export const requestStatusEnum = pgEnum("request_status", [
   "received",
   "failed",
+  "photos_reviewed",
+  "scheduled",
+  "deposit_paid",
+  "in_progress",
+  "balance_paid",
+  "revisions",
+  "handed_over",
 ]);
 
 export const fileGroupEnum = pgEnum("file_group", ["basic", "extra"]);
+
+export const COMMISSION_STATUSES = requestStatusEnum.enumValues;
+export type CommissionStatus = (typeof COMMISSION_STATUSES)[number];
 
 export const commissionRequests = pgTable("commission_requests", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -63,6 +75,16 @@ export const commissionRequests = pgTable("commission_requests", {
 
   notifyEmailSentAt: timestamp("notify_email_sent_at", { withTimezone: true }),
   confirmEmailSentAt: timestamp("confirm_email_sent_at", { withTimezone: true }),
+
+  /** Admin fields (phase 2) */
+  photosSufficient: boolean("photos_sufficient"),
+  photoNotes: text("photo_notes"),
+  scheduledMonth: varchar("scheduled_month", { length: 40 }),
+  depositPaidAt: timestamp("deposit_paid_at", { withTimezone: true }),
+  balancePaidAt: timestamp("balance_paid_at", { withTimezone: true }),
+  revisionCount: integer("revision_count").notNull().default(0),
+  handoverNotes: text("handover_notes"),
+  adminNotes: text("admin_notes"),
 });
 
 export const commissionFiles = pgTable("commission_files", {

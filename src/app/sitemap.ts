@@ -2,7 +2,13 @@ import type { MetadataRoute } from "next";
 import { routing, type AppPathname } from "@/i18n/routing";
 import { languageAlternates, localizedUrl } from "@/lib/site";
 
-const paths = Object.keys(routing.pathnames) as AppPathname[];
+const paths = (Object.keys(routing.pathnames) as AppPathname[]).filter(
+  (pathname) =>
+    !pathname.startsWith("/admin") &&
+    !pathname.includes("[") &&
+    pathname !== "/sign-in" &&
+    pathname !== "/sign-up",
+);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const entries: MetadataRoute.Sitemap = [];

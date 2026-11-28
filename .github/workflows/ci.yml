@@ -38,6 +38,11 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_SITE_URL: https://nuttyfelt-web-production.up.railway.app
+          # CI placeholders only — production uses Railway Clerk keys.
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2ktcGxhY2Vob2xkZXIk
+          CLERK_SECRET_KEY: sk_test_ci_placeholder_secret_key_000
+          NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+          NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
 
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
@@ -47,6 +52,10 @@ jobs:
         env:
           CI: true
           NEXT_PUBLIC_SITE_URL: https://nuttyfelt-web-production.up.railway.app
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_Y2ktcGxhY2Vob2xkZXIk
+          CLERK_SECRET_KEY: sk_test_ci_placeholder_secret_key_000
+          NEXT_PUBLIC_CLERK_SIGN_IN_URL: /sign-in
+          NEXT_PUBLIC_CLERK_SIGN_UP_URL: /sign-up
 
       - name: Upload Playwright report
         if: failure()

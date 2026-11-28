@@ -47,3 +47,4 @@ yarn-error.log*
 # prototype local
 prototype/node_modules/
 prototype/dist/
+.clerk/

@@ -86,6 +86,17 @@ Set these variables on the Railway service (same names as `.env.example`):
 
 After the first public URL exists, add that origin to R2 CORS (`scripts/r2-cors.json`).
 
+## Admin portal (phase 2)
+
+Private `/admin` (Clerk). Not linked from public nav. Desktop + mobile shell.
+
+```bash
+# Dev keys are created by `npx clerk@latest init` into .env.local
+# Sign in at /sign-in — then open /admin
+```
+
+Claim the Clerk app when ready (`npx clerk@latest auth login`), then add production keys on Railway. Restrict sign-up to the artist in the Clerk dashboard (invite-only).
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) runs on PRs and pushes to `main` / `develop`:

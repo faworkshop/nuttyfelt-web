@@ -59,7 +59,7 @@ Resend is the default email choice because it is simple and works well from a Ne
 ## Auth
 
 - **v1 public site:** no user accounts.
-- **Phase 2 admin portal:** add authentication then, not now. The portal manages commission details and status, plus the Works showcase and Home page content. Reasonable later options include Auth.js, Clerk, or Supabase Auth, with the artist as the only user (or a very small set). This remains an open decision.
+- **Phase 2 admin portal:** **[Clerk](https://clerk.com)** (`@clerk/nextjs`). Artist-only (or a very small set). Private `/admin` routes; not linked from public nav. Admin UI must work on desktop and mobile.
 
 ## Payments
 
@@ -85,7 +85,7 @@ No extra “GEO platform” is required.
 
 ## Analytics and errors
 
-v1 includes both: **[Umami](https://umami.is)** for privacy-friendly analytics (Hobby cloud is enough at launch; exclude form field values), and **Sentry** (or similar) for form and upload failures in production.
+Deferred until after the admin portal: **[Umami](https://umami.is)** (privacy-friendly analytics; exclude form field values) and **Sentry** (or similar) for form/upload failures.
 
 ## What we are not choosing now
 
@@ -103,22 +103,23 @@ v1 includes both: **[Umami](https://umami.is)** for privacy-friendly analytics (
 | From address | Default `hello@nuttyfelt.com` — **configurable** via env |
 | Hosting | **Railway** + **Neon** Postgres + **Cloudflare R2** |
 | v1 artist intake | **Email only** (signed photo links) until phase 2 admin |
-| Analytics | **Umami** (Hobby cloud fine for v1); exclude form field values |
-| Error monitoring | Yes — e.g. Sentry for form/upload failures |
+| Analytics | Deferred (Umami) — after admin portal |
+| Error monitoring | Deferred (Sentry) — after admin portal |
+| Real studio photos | Deferred — after admin portal / when assets ready |
+| Admin auth | **Clerk** |
 | Production domain | TBC |
 
 ## Open decisions
 
 1. Production domain and DNS (and Resend domain verification for sending as `hello@nuttyfelt.com`).
-2. Sentry project setup — during implementation.
-3. Phase 2 admin auth vendor (Auth.js / Clerk / Supabase Auth) — decide when starting phase 2.
+2. Clerk production instance keys on Railway (after claiming the Clerk app).
 
 ## Suggested implementation order (after UI/UX is agreed)
 
 See [ui-ux.md](ui-ux.md) for visual direction, tokens, and page compositions.
 
-1. ~~App skeleton: Next.js, TypeScript, next-intl, static pages with bilingual copy~~ — done (JSON-LD / `llms.txt` still to add).
-2. Direct-upload form, Postgres request records, and transactional email.
-3. Privacy review: no public leakage of private fields; signed, expiring photo links.
-4. Umami + Sentry wiring.
-5. Phase 2 admin portal for commissions plus Works / Home content management.
+1. ~~App skeleton: Next.js, TypeScript, next-intl, static pages with bilingual copy~~ — done.
+2. ~~Direct-upload form, Postgres request records, and transactional email~~ — done.
+3. ~~GEO (JSON-LD / llms.txt / sitemap) + Railway + CI~~ — done.
+4. Phase 2 admin portal (Clerk) — commissions, then Works / Home content.
+5. Umami + Sentry + real studio photography.

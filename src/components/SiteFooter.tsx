@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
-import type { AppPathname } from "@/i18n/routing";
+import type { StaticAppPathname } from "@/i18n/routing";
 
 const navItems: {
-  href: AppPathname;
+  href: StaticAppPathname;
   key: "home" | "works" | "halo" | "process" | "about" | "faq" | "commission";
 }[] = [
   { href: "/", key: "home" },

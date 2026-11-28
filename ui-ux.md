@@ -242,11 +242,10 @@ Honor `prefers-reduced-motion`: replace with simple opacity fades or none.
 - Language switch and nav operable by keyboard.
 - Images have meaningful alt; decorative texture may be empty alt.
 
-## Phase 2 admin portal (UX sketch only)
+## Phase 2 admin portal (UX sketch)
 
-Not designed in visual detail for v1 launch. When built:
-
-- Private URL, no public nav link; simple auth gate.
+- **Auth:** Clerk. Private `/admin`, no public nav link.
+- **Responsive:** works on desktop and mobile (collapsible nav on small screens; list → detail friendly).
 - **Commissions:** table/list + detail view; status control; photo gallery with signed access; notes fields. Dense and functional — clarity over gallery branding.
 - **Works / Home content:** edit finished-work entries, upload studio images, reorder, toggle visibility, pick Home featured slots.
 - Keep “Wool & brass” tokens for cohesion, but prioritize operable forms and status over marketing layout.

@@ -4,6 +4,7 @@ type Props = {
   children: ReactNode;
 };
 
+/** Pass-through root; `<html>` / `<body>` live in `[locale]/layout`. */
 export default function RootLayout({ children }: Props) {
   return children;
 }

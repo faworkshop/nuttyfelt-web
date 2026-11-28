@@ -15,7 +15,8 @@ export function pageMetadata(input: {
       : `${input.title} · ${SITE_NAME}`;
 
   return {
-    title: fullTitle,
+    // absolute — layout sets a `%s · site` template for auth/admin pages
+    title: { absolute: fullTitle },
     description: input.description,
     alternates: {
       canonical,
