@@ -1,0 +1,1 @@
+ALTER TABLE "work_images" ADD COLUMN "home_hero" boolean DEFAULT false NOT NULL;

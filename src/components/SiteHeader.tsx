@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import type { StaticAppPathname } from "@/i18n/routing";
@@ -18,14 +19,40 @@ const navItems: {
   { href: "/faq", key: "faq" },
 ];
 
+function paramValue(
+  params: ReturnType<typeof useParams>,
+  key: string,
+): string | undefined {
+  const value = params[key];
+  if (Array.isArray(value)) return value[0];
+  return value ?? undefined;
+}
+
+/** next-intl locale switch needs route params on templates like `/works/[id]`. */
+function localeSwitchHref(
+  pathname: string,
+  params: ReturnType<typeof useParams>,
+) {
+  if (pathname === "/works/[id]") {
+    const id = paramValue(params, "id");
+    if (id) {
+      return { pathname: "/works/[id]" as const, params: { id } };
+    }
+    return "/works" as const;
+  }
+  return pathname as StaticAppPathname;
+}
+
 export function SiteHeader() {
   const t = useTranslations("nav");
   const tUi = useTranslations();
   const locale = useLocale();
   const pathname = usePathname();
+  const params = useParams();
   const [open, setOpen] = useState(false);
   const otherLocale = locale === "en" ? "zh-Hant" : "en";
   const otherLabel = locale === "en" ? "中文" : "EN";
+  const switchHref = localeSwitchHref(pathname, params);
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +80,7 @@ export function SiteHeader() {
           </Link>
           <div className="flex items-center gap-3 md:gap-4">
             <Link
-              href={pathname as StaticAppPathname}
+              href={switchHref}
               locale={otherLocale}
               className="font-ui text-sm text-ink-muted hover:text-ink"
             >

@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { CommissionFilters } from "@/components/admin/CommissionFilters";
 import { StatusBadge } from "@/components/admin/StatusBadge";
@@ -23,9 +21,14 @@ function formatWhen(date: Date) {
   }).format(date);
 }
 
-async function CommissionList({ status }: { status?: CommissionStatus }) {
-  await connection();
-  await auth.protect();
+async function CommissionList({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const raw = (await searchParams).status;
+  const status: CommissionStatus | undefined =
+    raw && isCommissionStatus(raw) ? raw : undefined;
 
   const [rows, counts] = await Promise.all([
     listCommissions({ status }),
@@ -34,8 +37,7 @@ async function CommissionList({ status }: { status?: CommissionStatus }) {
   const total = Object.values(counts).reduce((sum, n) => sum + (n ?? 0), 0);
 
   return (
-    <div className="mx-auto max-w-5xl">
-      <h1 className="font-display text-3xl text-ink md:text-4xl">Commissions</h1>
+    <>
       <p className="mt-2 font-body text-ink-muted">
         {total} total · newest first
       </p>
@@ -48,7 +50,6 @@ async function CommissionList({ status }: { status?: CommissionStatus }) {
         </div>
       ) : (
         <>
-          {/* Mobile cards */}
           <ul className="mt-6 space-y-3 md:hidden">
             {rows.map((row) => (
               <li key={row.id}>
@@ -81,7 +82,6 @@ async function CommissionList({ status }: { status?: CommissionStatus }) {
             ))}
           </ul>
 
-          {/* Desktop table */}
           <div className="mt-6 hidden overflow-x-auto rounded-md border border-line bg-paper md:block">
             <table className="w-full min-w-[40rem] text-left font-ui text-sm">
               <thead className="border-b border-line bg-mist/50 text-ink-muted">
@@ -122,21 +122,23 @@ async function CommissionList({ status }: { status?: CommissionStatus }) {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
 
-export default async function AdminCommissionsPage({ searchParams }: Props) {
-  const raw = (await searchParams).status;
-  const status = raw && isCommissionStatus(raw) ? raw : undefined;
-
+export default function AdminCommissionsPage({ searchParams }: Props) {
   return (
-    <Suspense
-      fallback={
-        <div className="font-ui text-ink-muted">Loading commissions…</div>
-      }
-    >
-      <CommissionList status={status} />
-    </Suspense>
+    <div className="mx-auto max-w-5xl">
+      <h1 className="font-display text-3xl text-ink md:text-4xl">Commissions</h1>
+      <Suspense
+        fallback={
+          <p className="mt-2 font-ui text-sm text-ink-muted">
+            Loading commissions…
+          </p>
+        }
+      >
+        <CommissionList searchParams={searchParams} />
+      </Suspense>
+    </div>
   );
 }

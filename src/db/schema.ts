@@ -102,7 +102,46 @@ export const commissionFiles = pgTable("commission_files", {
   contentType: varchar("content_type", { length: 120 }).notNull(),
 });
 
+/** Public Works showcase entries (studio marketing images only). */
+export const works = pgTable("works", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+
+  titleZh: varchar("title_zh", { length: 200 }).notNull(),
+  titleEn: varchar("title_en", { length: 200 }).notNull(),
+  captionZh: text("caption_zh"),
+  captionEn: text("caption_en"),
+
+  sortOrder: integer("sort_order").notNull().default(0),
+  visible: boolean("visible").notNull().default(true),
+  featuredOnHome: boolean("featured_on_home").notNull().default(false),
+  /** Lower sorts first among home featured; null if not featured */
+  featuredRank: integer("featured_rank"),
+});
+
+/** Studio photos for a work. Lowest sort_order is the cover (home/works cards). */
+export const workImages = pgTable("work_images", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+
+  workId: uuid("work_id")
+    .notNull()
+    .references(() => works.id, { onDelete: "cascade" }),
+
+  /** R2 key under studio/ — never a commissions/ client path */
+  storageKey: text("storage_key").notNull(),
+  contentType: varchar("content_type", { length: 120 }).notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  /** At most one image site-wide should be true — drives the home full-bleed hero. */
+  homeHero: boolean("home_hero").notNull().default(false),
+});
+
 export type CommissionRequest = typeof commissionRequests.$inferSelect;
 export type NewCommissionRequest = typeof commissionRequests.$inferInsert;
 export type CommissionFile = typeof commissionFiles.$inferSelect;
 export type NewCommissionFile = typeof commissionFiles.$inferInsert;
+export type Work = typeof works.$inferSelect;
+export type NewWork = typeof works.$inferInsert;
+export type WorkImage = typeof workImages.$inferSelect;
+export type NewWorkImage = typeof workImages.$inferInsert;

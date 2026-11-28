@@ -1,11 +1,18 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { JsonLd } from "@/components/JsonLd";
 import { PageLoading } from "@/components/PageLoading";
+import { WorkFigure } from "@/components/WorkFigure";
 import { Link } from "@/i18n/navigation";
 import type { AppLocale } from "@/i18n/routing";
+import {
+  getHomeHeroImageUrl,
+  listHomeFeaturedWorks,
+  presentWork,
+} from "@/lib/admin/works";
 import { pageMetadata } from "@/lib/seo";
 import {
   commissionOfferJsonLd,
@@ -37,10 +44,18 @@ export default function HomePage({ params }: Props) {
 }
 
 async function HomeContent({ params }: Props) {
+  await connection();
   const { locale: raw } = await params;
   const locale = (raw === "en" ? "en" : "zh-Hant") as AppLocale;
   setRequestLocale(locale);
   const t = await getTranslations("home");
+  const featured = (await listHomeFeaturedWorks(3)).map((row) =>
+    presentWork(row, locale),
+  );
+  const heroImage =
+    (await getHomeHeroImageUrl()) ??
+    featured.find((item) => item.imageUrl)?.imageUrl ??
+    null;
 
   return (
     <>
@@ -48,8 +63,17 @@ async function HomeContent({ params }: Props) {
       <JsonLd data={commissionOfferJsonLd(locale)} />
       <section className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0">
-          <div className="photo-frame photo-placeholder h-full w-full">
-            <div className="halo-ring" />
+          <div className={`photo-frame h-full w-full ${heroImage ? "" : "photo-placeholder"}`}>
+            {heroImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={heroImage}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <div className="halo-ring" />
+            )}
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-paper via-paper/75 to-paper/20 md:via-paper/55" />
         </div>
@@ -110,14 +134,19 @@ async function HomeContent({ params }: Props) {
             <p className="lede">{t("worksBody")}</p>
           </div>
           <div className="mt-12 grid gap-8 md:grid-cols-3">
-            {[t("workA"), t("workB"), t("workC")].map((title) => (
-              <figure key={title}>
-                <div className="photo-frame photo-placeholder aspect-[4/5]">
-                  <div className="halo-ring" />
-                </div>
-                <figcaption className="mt-4 font-display text-lg">{title}</figcaption>
-              </figure>
-            ))}
+            {featured.length > 0
+              ? featured.map((item) => (
+                  <WorkFigure
+                    key={item.id}
+                    workId={item.id}
+                    title={item.title}
+                    caption={item.caption}
+                    imageUrl={item.imageUrl}
+                  />
+                ))
+              : [t("workA"), t("workB"), t("workC")].map((title) => (
+                  <WorkFigure key={title} title={title} />
+                ))}
           </div>
           <Link
             href="/works"

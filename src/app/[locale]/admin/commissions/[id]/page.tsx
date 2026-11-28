@@ -1,6 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { CommissionAdminForm } from "@/components/admin/CommissionAdminForm";
 import { CommissionStatusForm } from "@/components/admin/CommissionStatusForm";
@@ -9,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { getCommission } from "@/lib/admin/commissions";
 import { getSignedDownloadUrl } from "@/lib/r2-objects";
 import { toReferenceNo } from "@/lib/reference";
+import type { CommissionFile } from "@/db/schema";
 
 type Props = {
   params: Promise<{ id: string; locale: string }>;
@@ -34,25 +33,67 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
-async function CommissionDetail({ id }: { id: string }) {
-  await connection();
-  await auth.protect();
-
-  const data = await getCommission(id);
-  if (!data) notFound();
-
-  const { request, files } = data;
-  const basic = files.filter((f) => f.group === "basic");
-  const extra = files.filter((f) => f.group === "extra");
-
+async function SignedPhotoGroups({ files }: { files: CommissionFile[] }) {
   const withUrls = await Promise.all(
     files.map(async (file) => ({
       ...file,
       url: await getSignedDownloadUrl(file.storageKey),
     })),
   );
-  const basicLinks = withUrls.filter((f) => f.group === "basic");
-  const extraLinks = withUrls.filter((f) => f.group === "extra");
+  const basic = withUrls.filter((f) => f.group === "basic");
+  const extra = withUrls.filter((f) => f.group === "extra");
+
+  return (
+    <>
+      <PhotoGroup title={`Basic (${basic.length})`} files={basic} />
+      <PhotoGroup title={`Extra (${extra.length})`} files={extra} />
+    </>
+  );
+}
+
+function PhotoGroup({
+  title,
+  files,
+}: {
+  title: string;
+  files: {
+    id: string;
+    originalFilename: string;
+    sizeBytes: number;
+    url: string;
+  }[];
+}) {
+  if (!files.length) return null;
+  return (
+    <div className="mt-5">
+      <h3 className="font-ui text-sm text-ink-muted">{title}</h3>
+      <ul className="mt-2 space-y-2">
+        {files.map((file) => (
+          <li key={file.id}>
+            <a
+              href={file.url}
+              target="_blank"
+              rel="noreferrer"
+              className="font-ui text-sm text-brass-deep underline-offset-4 hover:underline"
+            >
+              {file.originalFilename}
+            </a>
+            <span className="ml-2 font-ui text-xs text-ink-muted">
+              {(file.sizeBytes / (1024 * 1024)).toFixed(1)} MB
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+async function CommissionDetail({ params }: Props) {
+  const { id } = await params;
+  const data = await getCommission(id);
+  if (!data) notFound();
+
+  const { request, files } = data;
 
   const living =
     request.livingStatus === "with"
@@ -142,8 +183,15 @@ async function CommissionDetail({ id }: { id: string }) {
         <p className="mt-1 font-ui text-xs text-ink-muted">
           Signed links expire in 7 days — reopen this page for fresh links.
         </p>
-        <PhotoGroup title={`Basic (${basic.length})`} files={basicLinks} />
-        <PhotoGroup title={`Extra (${extra.length})`} files={extraLinks} />
+        <Suspense
+          fallback={
+            <p className="mt-5 font-ui text-sm text-ink-muted">
+              Signing photo links…
+            </p>
+          }
+        >
+          <SignedPhotoGroups files={files} />
+        </Suspense>
       </section>
 
       <section className="mt-6 rounded-md border border-line bg-paper p-4 md:p-5">
@@ -156,51 +204,12 @@ async function CommissionDetail({ id }: { id: string }) {
   );
 }
 
-function PhotoGroup({
-  title,
-  files,
-}: {
-  title: string;
-  files: {
-    id: string;
-    originalFilename: string;
-    sizeBytes: number;
-    url: string;
-  }[];
-}) {
-  if (!files.length) return null;
-  return (
-    <div className="mt-5">
-      <h3 className="font-ui text-sm text-ink-muted">{title}</h3>
-      <ul className="mt-2 space-y-2">
-        {files.map((file) => (
-          <li key={file.id}>
-            <a
-              href={file.url}
-              target="_blank"
-              rel="noreferrer"
-              className="font-ui text-sm text-brass-deep underline-offset-4 hover:underline"
-            >
-              {file.originalFilename}
-            </a>
-            <span className="ml-2 font-ui text-xs text-ink-muted">
-              {(file.sizeBytes / (1024 * 1024)).toFixed(1)} MB
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export default async function AdminCommissionDetailPage({ params }: Props) {
-  const { id } = await params;
-
+export default function AdminCommissionDetailPage({ params }: Props) {
   return (
     <Suspense
       fallback={<div className="font-ui text-ink-muted">Loading request…</div>}
     >
-      <CommissionDetail id={id} />
+      <CommissionDetail params={params} />
     </Suspense>
   );
 }

@@ -1,10 +1,15 @@
 import { clerkMiddleware } from "@clerk/nextjs/server";
 import createMiddleware from "next-intl/middleware";
+import { NextResponse } from "next/server";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-export default clerkMiddleware(async (auth, request) => {
+export default clerkMiddleware(async (_auth, request) => {
+  // next-intl must not rewrite API routes — that returns HTML to fetch() callers.
+  if (request.nextUrl.pathname.startsWith("/api")) {
+    return NextResponse.next();
+  }
   return intlMiddleware(request);
 });
 

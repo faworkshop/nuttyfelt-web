@@ -15,6 +15,27 @@
       "when": 1795831286458,
       "tag": "0001_green_annihilus",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795845611153,
+      "tag": "0002_futuristic_marvel_apes",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795850755027,
+      "tag": "0003_lame_odin",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795851410751,
+      "tag": "0004_graceful_ulik",
+      "breakpoints": true
     }
   ]
 }

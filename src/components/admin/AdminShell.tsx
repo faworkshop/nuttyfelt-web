@@ -20,7 +20,7 @@ export function AdminShell({ children }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="flex min-h-full flex-col bg-wool md:flex-row">
+    <div className="flex min-h-dvh flex-col bg-wool md:flex-row">
       <header className="flex items-center justify-between border-b border-line bg-paper px-4 py-3 md:hidden">
         <p className="font-display text-lg text-ink">nuttyfelt admin</p>
         <div className="flex items-center gap-3">
@@ -41,7 +41,7 @@ export function AdminShell({ children }: Props) {
         id="admin-nav"
         className={`${
           menuOpen ? "flex" : "hidden"
-        } w-full flex-col border-b border-line bg-paper px-4 py-4 md:flex md:min-h-full md:w-56 md:shrink-0 md:border-b-0 md:border-r md:px-5 md:py-6`}
+        } w-full flex-col border-b border-line bg-paper px-4 py-4 md:flex md:min-h-dvh md:w-56 md:shrink-0 md:border-b-0 md:border-r md:px-5 md:py-6`}
       >
         <div className="mb-8 hidden items-center justify-between md:flex">
           <p className="font-display text-xl text-ink">nuttyfelt</p>

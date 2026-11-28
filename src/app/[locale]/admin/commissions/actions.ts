@@ -1,7 +1,7 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import { requireAdminPage } from "@/lib/admin/auth";
 import { isCommissionStatus } from "@/lib/admin/commission-status";
 import {
   updateCommissionAdminFields,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/admin/commissions";
 
 export async function setCommissionStatusAction(formData: FormData) {
-  await auth.protect();
+  await requireAdminPage();
 
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
@@ -25,7 +25,7 @@ export async function setCommissionStatusAction(formData: FormData) {
 }
 
 export async function saveCommissionAdminAction(formData: FormData) {
-  await auth.protect();
+  await requireAdminPage();
 
   const id = String(formData.get("id") ?? "");
   if (!id) throw new Error("Missing commission id");

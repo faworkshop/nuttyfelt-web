@@ -1,12 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
-import { connection } from "next/server";
 import { Suspense } from "react";
 import { Link } from "@/i18n/navigation";
 import { countCommissionsByStatus } from "@/lib/admin/commissions";
 
 async function OverviewStats() {
-  await connection();
-  await auth.protect();
   const counts = await countCommissionsByStatus();
   const open =
     (counts.received ?? 0) +
@@ -37,9 +33,7 @@ async function OverviewStats() {
   );
 }
 
-export default async function AdminHomePage() {
-  await auth.protect();
-
+export default function AdminHomePage() {
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="font-display text-3xl text-ink md:text-4xl">Overview</h1>

@@ -56,20 +56,20 @@ export async function countCommissionsByStatus() {
 
 export async function getCommission(id: string) {
   const db = getDb();
-  const [request] = await db
-    .select()
-    .from(commissionRequests)
-    .where(eq(commissionRequests.id, id))
-    .limit(1);
+  const [[request], files] = await Promise.all([
+    db
+      .select()
+      .from(commissionRequests)
+      .where(eq(commissionRequests.id, id))
+      .limit(1),
+    db
+      .select()
+      .from(commissionFiles)
+      .where(eq(commissionFiles.requestId, id))
+      .orderBy(commissionFiles.createdAt),
+  ]);
 
   if (!request) return null;
-
-  const files = await db
-    .select()
-    .from(commissionFiles)
-    .where(eq(commissionFiles.requestId, id))
-    .orderBy(commissionFiles.createdAt);
-
   return { request, files };
 }
 

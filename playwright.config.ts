@@ -22,8 +22,14 @@ export default defineConfig({
       ? `npx next start --port ${PORT}`
       : `npm run build && npx next start --port ${PORT}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    // Don't reuse a manual `next start` — admin e2e needs E2E_BYPASS_ADMIN_AUTH on the process.
+    reuseExistingServer: process.env.PW_REUSE_SERVER === "1",
     timeout: 180_000,
+    env: {
+      ...process.env,
+      // Allow admin UI e2e without a live Clerk session (never set on Railway).
+      E2E_BYPASS_ADMIN_AUTH: "1",
+    },
   },
   projects: [
     {

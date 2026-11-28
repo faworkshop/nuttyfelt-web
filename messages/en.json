@@ -43,7 +43,9 @@
   },
   "works": {
     "title": "Works",
-    "lede": "Each piece is a handmade custom portrait from photos — not stock on a shelf."
+    "lede": "Each piece is a handmade custom portrait from photos — not stock on a shelf.",
+    "back": "All works",
+    "gallery": "Gallery"
   },
   "halo": {
     "title": "The halo",

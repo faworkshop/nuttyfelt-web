@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { routing, type AppPathname } from "@/i18n/routing";
-import { languageAlternates, localizedUrl } from "@/lib/site";
+import { listVisibleWorks } from "@/lib/admin/works";
+import { absoluteUrl, languageAlternates, localizedUrl } from "@/lib/site";
 
 const paths = (Object.keys(routing.pathnames) as AppPathname[]).filter(
   (pathname) =>
@@ -10,7 +11,7 @@ const paths = (Object.keys(routing.pathnames) as AppPathname[]).filter(
     pathname !== "/sign-up",
 );
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   for (const pathname of paths) {
@@ -25,6 +26,28 @@ export default function sitemap(): MetadataRoute.Sitemap {
         alternates: { languages },
       });
     }
+  }
+
+  try {
+    const works = await listVisibleWorks();
+    for (const work of works) {
+      const languages: Record<string, string> = {
+        "zh-Hant": absoluteUrl(`/works/${work.id}`),
+        en: absoluteUrl(`/en/works/${work.id}`),
+        "x-default": absoluteUrl(`/works/${work.id}`),
+      };
+      for (const locale of routing.locales) {
+        entries.push({
+          url: languages[locale],
+          lastModified: work.updatedAt,
+          changeFrequency: "weekly",
+          priority: 0.6,
+          alternates: { languages },
+        });
+      }
+    }
+  } catch {
+    // Sitemap still ships static routes if DB is unavailable at build.
   }
 
   return entries;
